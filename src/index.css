@@ -1,0 +1,157 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap");
+html,
+body,
+#root,
+.app,
+.content {
+  height: 100%;
+  width: 100%;
+  font-family: "poppins", sans-serif;
+  background-color: #080b2a;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  height: 100vh;
+}
+
+.sidebar {
+  position: fixed;
+  height: 100%;
+  width: 20%;
+}
+
+.content {
+  margin-left: 10px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.footer {
+  bottom: 0;
+  position: relative;
+
+  width: auto;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #e0e0e0;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+h1 {
+  font-weight: bold;
+  font-size: 70px;
+}
+
+.gradient-border {
+  background: linear-gradient(to right, #1e5be0, #46ecbc);
+  border-radius: 10px;
+}
+
+.box {
+  position: relative;
+  background: #141735;
+  border-radius: 10px;
+  height: 98.5%;
+  width: 99.8%;
+}
+
+.middle-box {
+  position: relative;
+  background: #141735;
+  border-radius: 10px;
+  height: 98.5%;
+  width: 99.6%;
+}
+
+.hexmap-bg {
+  position: relative;
+  background-image: url("./assets/hexmap.svg");
+  background-repeat: no-repeat;
+  background-position: center 50%;
+  width: 100%;
+
+  height: 80%;
+  z-index: 0;
+}
+
+.hexmap-bg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(8, 11, 42, 0.4);
+  z-index: -1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+.gradient-border-mask {
+  display: flow-root;
+  position: relative;
+  padding: 0.5rem;
+  background-color: linear-gradient(
+    270deg,
+    rgba(255, 255, 255, 0.05) -20.26%,
+    rgba(255, 255, 255, 0.05) 99.82%
+  );
+
+  backdrop-filter: blur(2px);
+
+  border-radius: 10px;
+}
+
+.gradient-border-mask::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: linear-gradient(240deg, #1e5be0, #46ecbc) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+}
+
+/* <div class="gradient-border-mask">
+  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus, aut fugit? Perspiciatis cupiditate, tenetur rem ratione facere iste inventore harum, quaerat, similique voluptate ab vitae saepe quod odit eveniet assumenda!</p>
+</div>  */
+
+.category {
+  background-color: #3be0fe;
+  border: 1px solid;
+  border-radius: 5px;
+
+  color: black;
+  padding: 5px;
+  margin-bottom: 101px;
+  display: inline-block;
+}
+
+.pro-sidebar {
+  z-index: 1; /* Lower than the arrow icon */
+}
