@@ -4,9 +4,9 @@ import Homepage from "./Homepage";
 import Providers from "./Providers";
 import Settings from "./Settings";
 import Provider from "./Provider";
-import BarChart from "./BarChart";
 import PieChart from "./PieChart";
-import LineChart from "./LineChart";
+import Leaderboard from "./Leaderboard";
+import Docs from "./Docs";
 
 export {
   Dashboard,
@@ -15,7 +15,7 @@ export {
   Providers,
   Settings,
   Provider,
-  BarChart,
   PieChart,
-  LineChart,
+  Leaderboard,
+  Docs,
 };

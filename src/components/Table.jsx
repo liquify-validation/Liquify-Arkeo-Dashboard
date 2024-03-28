@@ -31,11 +31,7 @@ const Table = () => {
 
   const columns = [
     { field: "nodeAddress", headerName: "Node Address" },
-    {
-      field: "icons",
-      headerName: "",
-      flex: 1,
-    },
+
     {
       field: "age",
       headerName: "Age",
@@ -100,26 +96,28 @@ const Table = () => {
       <Box
         m="40px 0 0 0"
         height="100%"
+        // className="gradient-table-mask"
         sx={{
-          "& .MuiDataGrid-main": { className: "gradient-border-mask" },
+          "& .MuiDataGrid-main": {},
           "& .MuiDataGrid-root": { border: "none" },
           "& .MuiDataGrid-cell": { borderBottom: "none" },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
           "& .MuiDataGrid-columnHeaders": {
             backgroundColor: colors.primary[700],
             borderBottom: "none",
+            backdropFilter: "blur(8px)",
           },
           "& .MuiDataGrid-virtualScroller": {
             backgroundColor: colors.primary[300],
+            backdropFilter: "blur(12px)",
           },
           "& .MuiDataGrid-footerContainer": {
             borderTop: "none",
-            backgroundColor: colors.primary[700],
+            backgroundColor: colors.primary[300],
           },
           "& .MuiDataGrid-toolbarContainer .MuiButtonBase-root": {
-            color: "white",
+            color: colors.primary[500],
+            fontWeight: "700",
+            background: "transparent",
           },
         }}
       >

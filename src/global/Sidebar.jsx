@@ -14,6 +14,7 @@ import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
 import ArticleIcon from "@mui/icons-material/Article";
 import PieChartIcon from "@mui/icons-material/PieChart";
 import { ArkeoLogo } from "../assets";
+import { ArkeoIcon } from "../assets";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   return (
@@ -34,13 +35,13 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
   return (
     <Box
       sx={{
-        height: "100vh",
+        height: "100%",
         "& .pro-sidebar-inner": {
           background: `#21233F`,
         },
         "& .pro-icon-wrapper": { backgroundColor: "transparent !important" },
         "& .pro-inner-item": {
-          padding: "5px 35px 5px 20px !important",
+          padding: "5px 15px 5px 20px !important",
           marginBottom: "10px",
         },
         "& .pro-inner-item:hover": {
@@ -58,26 +59,32 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
     >
       <ProSidebar collapsed={isSidebar}>
         <Menu iconshape="square">
-          <MenuItem style={{ margin: "10px 0 40px 25px", color: "white" }}>
-            {!isSidebar && (
+          <MenuItem style={{ margin: "10px 0 40px 0px", color: "white" }}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
               <Box
                 display="flex"
                 justifyContent="space-between"
-                alignItems="center"
+                alignItems="left"
               >
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="left"
-                >
+                {isSidebar ? (
+                  <img
+                    src={ArkeoIcon}
+                    alt="Arkeo Icon"
+                    style={{ width: "30px" }}
+                  />
+                ) : (
                   <img
                     src={ArkeoLogo}
                     alt="Arkeo Logo"
-                    style={{ width: "150px" }}
-                  />{" "}
-                </Box>
+                    style={{ width: "150px", marginLeft: "25px" }}
+                  />
+                )}
               </Box>
-            )}
+            </Box>
           </MenuItem>
 
           <Box paddingLeft={isSidebar ? undefined : "10%"}>
@@ -97,13 +104,13 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
               setSelected={setSelected}
             />
 
-            <Item
+            {/* <Item
               title="Explore"
               to="/explore"
               icon={<ExploreOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
 
             <Item
               title="Docs"
@@ -113,13 +120,13 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
               setSelected={setSelected}
             />
 
-            <Item
+            {/* <Item
               title="Provider"
               to="/provider"
               icon={<PieChartIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
           </Box>
         </Menu>
       </ProSidebar>

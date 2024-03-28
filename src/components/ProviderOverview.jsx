@@ -15,20 +15,35 @@ const ProviderOverview = ({
   totalProviders,
   bondedContract,
   arkeoPrice,
+  contribution,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   const Item = ({ icon, title, value }) => (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
       <img
         src={icon}
         alt={`${title} icon`}
-        style={{ width: "70px", height: "50px" }}
+        style={{ width: "80px", height: "50px" }}
       />
       <Box>
-        <Typography variant="subtitle1">{title}</Typography>
-        <Typography variant="body1">{value}</Typography>
+        <Typography
+          variant="5"
+          fontWeight="700"
+          fontSize="16px"
+          color={colors.primary[500]}
+        >
+          {title}
+        </Typography>
+        <Typography
+          variant="body1"
+          color={colors.primary[800]}
+          fontWeight="600"
+          fontSize="14px"
+        >
+          {value}
+        </Typography>
       </Box>
     </Box>
   );
@@ -37,36 +52,43 @@ const ProviderOverview = ({
     <Box
       paddingTop="30px"
       paddingBottom="30px"
-      paddingLeft="50px"
-      width="60vw"
+      paddingLeft="70px"
+      width="90vw"
       className="gradient-border-mask"
     >
       <Grid container spacing={8}>
-        <Grid item xs={12} sm={4}>
-          <Item icon={BlockIcon} title="Current Block" value={currentBlock} />
+        <Grid item xs={12} sm={3}>
+          <Item icon={BlockIcon} title="CURRENT BLOCK" value={currentBlock} />
         </Grid>
-        <Grid item xs={12} sm={4}>
-          <Item icon={TaxIcon} title="Total Amount Taxed" value={totalTaxed} />
+        <Grid item xs={12} sm={3}>
+          <Item icon={TaxIcon} title="TOTAL AMOUNT TAXED" value={totalTaxed} />
         </Grid>
-        <Grid item xs={12} sm={4}>
-          <Item icon={TimeIcon} title="24 Hour Calls" value={calls} />
+        <Grid item xs={12} sm={3}>
+          <Item icon={TimeIcon} title="24 HOUR CALLS" value={calls} />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Item
             icon={ProviderIcon}
-            title="Total Providers"
+            title="TOTAL PROVIDERS"
             value={totalProviders}
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Item
             icon={BondedIcon}
-            title="Bonded Contact Amount"
+            title="BONDED CONTRACT AMOUNT"
             value={bondedContract}
           />
         </Grid>
-        <Grid item xs={12} sm={4}>
-          <Item icon={PriceIcon} title="Arkeo Price" value={arkeoPrice} />
+        <Grid item xs={12} sm={3}>
+          <Item icon={PriceIcon} title="ARKEO PRICE" value={arkeoPrice} />
+        </Grid>
+        <Grid item xs={12} sm={3}>
+          <Item
+            icon={PriceIcon}
+            title="CONTRIBUTION TO RESERVE"
+            value={contribution}
+          />
         </Grid>
       </Grid>
     </Box>

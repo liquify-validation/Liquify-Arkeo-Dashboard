@@ -10,11 +10,14 @@ body,
   background-color: #080b2a;
 }
 
+/* main {
+  background-color: #ededed !important;
+} */
+
 .app {
   display: flex;
   flex-direction: column;
-  position: relative;
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .sidebar {
@@ -24,15 +27,13 @@ body,
 }
 
 .content {
-  margin-left: 10px;
   flex-grow: 1;
   overflow-y: auto;
+  margin-bottom: 20px;
 }
 
 .footer {
-  bottom: 0;
-  position: relative;
-
+  position: bottom;
   width: auto;
 }
 
@@ -87,8 +88,7 @@ h1 {
   background-repeat: no-repeat;
   background-position: center 50%;
   width: 100%;
-
-  height: 80%;
+  height: 125%;
   z-index: 0;
 }
 
@@ -99,8 +99,16 @@ h1 {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(8, 11, 42, 0.4);
+
   z-index: -1;
+}
+
+.hexmap-dark::before {
+  background-color: rgba(8, 11, 42, 0.4);
+}
+
+.hexmap-light::before {
+  background-color: rgba(237, 237, 237, 0.1);
 }
 
 * {
@@ -137,6 +145,66 @@ h1 {
   mask-composite: exclude;
 }
 
+.gradient-button-border-mask {
+  display: flow-root;
+  position: relative;
+  padding: 0.5rem;
+  background-color: linear-gradient(
+    270deg,
+    rgba(255, 255, 255, 0.05) -20.26%,
+    rgba(255, 255, 255, 0.05) 99.82%
+  );
+
+  backdrop-filter: blur(2px);
+
+  border-radius: 25px;
+}
+
+.gradient-button-border-mask::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 25px;
+  border: 1px solid transparent;
+  background: linear-gradient(240deg, #1e5be0, #46ecbc) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+}
+
+.gradient-table-mask {
+  display: flow-root;
+  position: relative;
+  padding: 0.1rem;
+  background-color: linear-gradient(
+    270deg,
+    rgba(255, 255, 255, 0.05) -20.26%,
+    rgba(255, 255, 255, 0.05) 99.82%
+  );
+
+  backdrop-filter: blur(2px);
+
+  border-radius: 10px;
+}
+
+.gradient-table-mask::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: linear-gradient(240deg, #1e5be0, #46ecbc) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask-composite: exclude;
+}
+
 /* <div class="gradient-border-mask">
   <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus, aut fugit? Perspiciatis cupiditate, tenetur rem ratione facere iste inventore harum, quaerat, similique voluptate ab vitae saepe quod odit eveniet assumenda!</p>
 </div>  */
@@ -153,5 +221,5 @@ h1 {
 }
 
 .pro-sidebar {
-  z-index: 1; /* Lower than the arrow icon */
+  z-index: 1;
 }

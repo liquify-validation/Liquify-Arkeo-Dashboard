@@ -1,18 +1,51 @@
-import React from "react";
 import Header from "../components/Header";
-import { Box, Button, IconButton, Typography, useTheme } from "@mui/material";
+import React, { useContext } from "react";
+import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
+import { mockProvidersData } from "../data/mockData";
+import { DataContext } from "../data/DataProvider";
 
-import { TimeIcon, ProviderIcon, BondedIcon } from "../assets";
+import {
+  TimeIcon,
+  ProviderIcon,
+  BondedIcon,
+  HexMap,
+  HexMapLight,
+} from "../assets";
 
-import { Pie, StatBox, ProgressBars } from "../components";
+import { Pie2, StatBox, ProgressBars } from "../components";
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const data = useContext(DataContext);
+  console.log("data", data);
+
+  const networkData = data.grabNetworkData?.[0] || {};
+  const numberOfProviders = networkData.number_of_providers || "Loading...";
+  const numberOfServices = networkData.number_of_services || "Loading...";
+  const totalBondedValue = (networkData.bond / 1e6).toFixed(2) || "Loading...";
+
+  const hexmapClassName = `hexmap-bg ${
+    theme.palette.mode === "dark" ? "hexmap-dark" : "hexmap-light"
+  }`;
+
+  const backgroundImageUrl =
+    theme.palette.mode === "dark" ? HexMap : HexMapLight;
 
   return (
-    <Box className="hexmap-bg">
+    <Box
+      className={hexmapClassName}
+      sx={{
+        backgroundImage: `url(${backgroundImageUrl})`,
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center 70%",
+        width: "100%",
+        height: "100%",
+        position: "relative",
+        zIndex: 0,
+      }}
+    >
       <Box m="40px">
         <Box display="flex" justifyContent="space-between" alignItems="center">
           <Header title="Dashboard" />
@@ -22,7 +55,7 @@ const Dashboard = () => {
           display="grid"
           gridTemplateColumns="repeat(12, 1fr)"
           gridAutoRows="140px"
-          gap="7rem"
+          gap="2rem"
           mt={5}
         >
           <Box
@@ -34,7 +67,7 @@ const Dashboard = () => {
           >
             <Box>
               <StatBox
-                number="84"
+                number={numberOfProviders}
                 title="TOTAL PROVIDERS"
                 progress=""
                 increase="+12%"
@@ -51,7 +84,7 @@ const Dashboard = () => {
           >
             <Box>
               <StatBox
-                number="440000"
+                number={`${totalBondedValue}`} // Adding 'M' to signify millions
                 title="TOTAL BONDED VALUE"
                 icon={<img src={BondedIcon} alt="Bonded Icon" />}
               />
@@ -67,8 +100,8 @@ const Dashboard = () => {
           >
             <Box>
               <StatBox
-                number="12,100"
-                title="24 HR VOLUME "
+                number={numberOfServices}
+                title="NUMBER OF SERVICES"
                 icon={<img src={TimeIcon} alt="Time Icon" />}
               />
             </Box>
@@ -76,7 +109,9 @@ const Dashboard = () => {
           {/*ROW 2*/}
         </Box>
         <Box mt={8}>
-          <Typography variant="h4">Stats Overview</Typography>
+          <Typography fontSize="20px" fontWeight="700" color={colors.text[100]}>
+            Stats Overview
+          </Typography>
           <Box
             borderColor={colors.primary[100]}
             sx={{ borderBottom: "1px solid", my: 2 }}
@@ -85,23 +120,28 @@ const Dashboard = () => {
         <Box
           display="grid"
           gridTemplateColumns="repeat(12, 1fr)"
-          gridAutoRows="140px"
-          gap="7rem"
+          gridAutoRows="auto"
+          gap="2rem"
           mt={5}
         >
           <Box
             gridColumn="span 6"
             display="flex"
-            height="400px"
             flexDirection="column"
             className="gradient-border-mask"
           >
             <Box>
-              <Typography variant="h3" margin="30px">
+              <Typography
+                fontSize="26px"
+                fontWeight="700"
+                color={colors.text[100]}
+                margin="30px"
+              >
                 Distribution of Network Providers
               </Typography>
               <Box
-                sx={{ maxWidth: "400px" }}
+                display="flex"
+                sx={{ ml: "30px", mr: "30px" }}
                 alignItems="center"
                 justifyContent="center"
                 marginLeft="30px"
@@ -117,17 +157,21 @@ const Dashboard = () => {
             flexDirection="column"
             className="gradient-border-mask"
           >
-            <Typography variant="h3" margin="30px">
+            <Typography
+              fontSize="26px"
+              fontWeight="700"
+              color={colors.text[100]}
+              margin="30px"
+            >
               Request Distribution by networks
             </Typography>
             <Box
-              sx={{ maxWidth: "400px" }}
+              sx={{ maxWidth: "600px", height: "300px" }}
               alignItems="center"
               justifyContent="center"
-              margin="10px"
-              marginLeft="150px"
+              margin="5px"
             >
-              <Pie />
+              <Pie2 />
             </Box>
           </Box>
         </Box>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -8,46 +8,134 @@ import {
 } from "@mui/material";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import { tokens } from "../theme";
-
-const data = [
-  { title: "Github", value: 60 },
-  { title: "Github", value: 30 },
-  { title: "Github", value: 80 },
-  { title: "Github", value: 40 },
-  { title: "Github", value: 90 },
-  { title: "Github", value: 70 },
-];
+import { DataContext } from "../data/DataProvider";
+import {
+  BitcoinIcon,
+  EthereumIcon,
+  CosmosIconDark,
+  CosmosIconLight,
+  ThorchainIcon,
+  OptimismIcon,
+  OsmosisIcon,
+  LiteCoinIcon,
+  PolygonIcon,
+  DogeCoinIcon,
+  BinanceIcon,
+  AvaxIcon,
+  BCHIcon,
+  ArkeoIcon,
+} from "../assets";
 
 const ProgressBars = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { numberOfServices } = useContext(DataContext);
+  const isDarkMode = theme.palette.mode === "dark";
+
+  const iconMapping = {
+    "arkeo-mainnet-fullnode": ArkeoIcon,
+    "avax-mainnet-fullnode": AvaxIcon,
+    "bch-mainnet-fullnode": BCHIcon,
+    "bnb-mainnet-fullnode": BinanceIcon,
+    "bsc-mainnet-fullnode": BinanceIcon,
+    "btc-mainnet-fullnode": BitcoinIcon,
+    "gaia-mainnet-rpc": isDarkMode ? CosmosIconDark : CosmosIconLight,
+    "doge-mainnet-fullnode": DogeCoinIcon,
+    "eth-mainnet-archivenode": EthereumIcon,
+    "eth-mainnet-fullnode": EthereumIcon,
+    "ltc-mainnet-fullnode": LiteCoinIcon,
+    "optimism-mainnet-fullnode": OptimismIcon,
+    "osmosis-mainnet-fullnode": OsmosisIcon,
+    "polygon-mainnet-fullnode": PolygonIcon,
+    "polygon-mainnet-archivenode": PolygonIcon,
+    "thorchain-mainnet-fullnode": ThorchainIcon,
+    "btc-mainnet-unchained": BitcoinIcon,
+    "eth-mainnet-unchained": EthereumIcon,
+    "optimism-mainnet-unchained": OptimismIcon,
+    "gaia-mainnet-grpc": isDarkMode ? CosmosIconDark : CosmosIconLight,
+  };
+
+  // Process data to calculate relative counts and adjust service names
+  const processedData = useMemo(() => {
+    const services = Object.values(numberOfServices || {});
+    const maxCount = Math.max(...services.map((s) => s.count));
+
+    // Map the services to include percentage calculation
+    const mappedServices = services.map((service) => ({
+      title: service.name
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" "),
+      count: service.count,
+      maxCount,
+      percentage: Math.round((service.count / maxCount) * 100), // This calculates the percentage
+    }));
+
+    // Sort the mapped services by percentage in descending order
+    return mappedServices.sort((a, b) => b.percentage - a.percentage);
+  }, [numberOfServices, isDarkMode]);
+
+  const getIconSrc = (name) => {
+    let iconName = name.toLowerCase().replace(/ /g, "-");
+    console.log("transformed icon name", iconName);
+    if (iconName === "gaia") {
+      return isDarkMode ? CosmosIconDark : CosmosIconLight;
+    }
+    return iconMapping[iconName];
+  };
 
   return (
-    <Box>
-      {data.map((item, index) => (
+    <Box width="100%">
+      {processedData.map((item, index) => (
         <Stack
           key={index}
           direction="row"
           alignItems="center"
-          spacing={3}
-          sx={{ mb: 3 }}
+          spacing={1}
+          sx={{ mb: 2, width: "100%" }}
         >
-          <GitHubIcon />
-          <Typography variant="subtitle1">{item.title}</Typography>
           <Box
             sx={{
-              width: "100%",
-              mx: 2,
+              display: "flex",
+              alignItems: "center",
+              width: "fit-content",
+              minWidth: "275px",
+              padding: "1px",
+            }}
+          >
+            {" "}
+            {/* Fixed width for icon + title */}
+            <img
+              src={getIconSrc(item.title)}
+              alt={`${item.title} Icon`}
+              style={{ width: 30, height: 30 }}
+            />
+            <Typography
+              fontSize="14px"
+              fontWeight="600"
+              color={colors.text[100]}
+              sx={{ ml: 1 }}
+            >
+              {item.title}
+            </Typography>
+          </Box>
+          <Box
+            sx={{
+              flexGrow: 1,
+              display: "flex",
+              alignItems: "center",
               border: "2px solid white",
               borderRadius: 10,
             }}
           >
+            {" "}
+            {/* Flex grow for progress bar */}
             <LinearProgress
               variant="determinate"
-              value={item.value}
+              value={item.percentage}
               sx={{
+                width: "100%", // Ensure progress bar takes the full width of its container
                 height: 15,
-                width: 320,
                 borderRadius: 25,
                 backgroundColor: "#D9D9D9",
                 "& .MuiLinearProgress-bar": {
@@ -57,7 +145,14 @@ const ProgressBars = () => {
               }}
             />
           </Box>
-          <Typography variant="subtitle1">{item.value}%</Typography>
+          <Typography
+            fontSize="16px"
+            fontWeight="700"
+            color={colors.text[100]}
+            sx={{ minWidth: "50px", textAlign: "right" }}
+          >
+            {`${item.count}/${item.maxCount}`}
+          </Typography>
         </Stack>
       ))}
     </Box>

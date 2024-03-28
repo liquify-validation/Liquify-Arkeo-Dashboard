@@ -1,51 +1,79 @@
-import React from "react";
-import { Box, Grid, Typography, IconButton, useTheme } from "@mui/material";
+import { Box, Grid, Typography, IconButton, Link } from "@mui/material";
 import { LiquifyLogo } from "../assets";
-import { tokens } from "../theme";
 import GitHubIcon from "@mui/icons-material/GitHub";
-import CloseIcon from "@mui/icons-material/Close";
+import XIcon from "@mui/icons-material/X";
 import EmailIcon from "@mui/icons-material/Email";
 
 const Footer = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-
   return (
     <Box
+      className="footer"
       sx={{
-        width: "100%",
         display: "flex",
-        position: "relative",
-        bottom: 0,
-        py: 2,
+        justifyContent: "center",
+        alignItems: "center",
+        py: 1,
+
+        backgroundColor: "#121533",
+        width: "100%",
       }}
-      backgroundColor={colors.primary[400]}
     >
-      <Grid container justifyContent="space-between" alignItems="center" px={3}>
-        <Grid item>
+      <Grid
+        container
+        justifyContent="space-between"
+        alignItems="center"
+        style={{ width: "100%" }}
+      >
+        <Grid item xs={12} sm={true} style={{ textAlign: "center" }}>
           <Typography
             variant="body1"
             component="span"
             sx={{ verticalAlign: "middle", mr: 1 }}
+            color="white"
           >
             Built by:
           </Typography>
-          <img
-            src={LiquifyLogo}
-            alt="Liquify Logo"
-            style={{ width: "120px", verticalAlign: "middle" }}
-          />
+          <Link
+            href="https://liquify.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src={LiquifyLogo}
+              alt="Liquify Logo"
+              style={{ width: "120px", verticalAlign: "middle" }}
+            />
+          </Link>
         </Grid>
-        <Grid item>
-          <IconButton aria-label="GitHub" size="large">
-            <GitHubIcon fontSize="large" />
-          </IconButton>
-          <IconButton aria-label="X" size="large">
-            <CloseIcon fontSize="large" />
-          </IconButton>
-          <IconButton aria-label="Email" size="large">
-            <EmailIcon fontSize="large" />
-          </IconButton>
+
+        <Grid item style={{ textAlign: "right", marginRight: "10px" }}>
+          <Link
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconButton aria-label="GitHub" size="large">
+              <GitHubIcon fontSize="large" style={{ color: "white" }} />
+            </IconButton>
+          </Link>
+          <Link
+            href="https://example.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {" "}
+            {/* Replace with your link */}
+            <IconButton aria-label="X" size="large">
+              <XIcon fontSize="large" style={{ color: "white" }} />
+            </IconButton>
+          </Link>
+          <Link href="mailto:email@example.com">
+            {" "}
+            {/* Replace with your email */}
+            <IconButton aria-label="Email" size="large">
+              <EmailIcon fontSize="large" style={{ color: "white" }} />
+            </IconButton>
+          </Link>
         </Grid>
       </Grid>
     </Box>

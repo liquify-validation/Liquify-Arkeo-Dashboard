@@ -18,13 +18,13 @@ export const tokens = (mode) => ({
         },
         primary: {
           100: "#d0d1d5",
-          200: "#a1a4ab", // MAIN BACKGROUND COLOR
-          300: "rgba(255, 255, 255, 0.1)",
+          200: "#080B2A", // MAIN BACKGROUND COLOR
+          300: "rgba(255, 255, 255, 0.1)", //TABLE COLUMNS
           400: "rgba(255, 255, 255, 0.04)",
-          500: "#141b2d",
-          600: "#101624",
-          700: "rgba(255, 255, 255, 0.20)",
-          800: "#080b12",
+          500: "#fffff", // PROVIDER OVERVIEW TITLE
+          600: "#21233f", //BUTTON BACKGROUND COLOR
+          700: "rgba(255, 255, 255, 0.20)", //TABLE HEADER
+          800: "#D8D8D8;", //PROVIDER OVERVIEW SUBTITLE
           900: "#040509",
         },
         greenAccent: {
@@ -60,6 +60,17 @@ export const tokens = (mode) => ({
           800: "#2a2d64",
           900: "#151632",
         },
+        text: {
+          100: "#FFF",
+          200: "#D8D8D8",
+          300: "#3e4396",
+          400: "#535ac8",
+          500: "#6870fa",
+          600: "#868dfb",
+          700: "#a4a9fc",
+          800: "#c3c6fd",
+          900: "#e1e2fe",
+        },
       }
     : {
         grey: {
@@ -75,13 +86,13 @@ export const tokens = (mode) => ({
         },
         primary: {
           100: "#040509",
-          200: "#080b12", // MAIN BACKGROUND COLOR
-          300: "#0c101b",
+          200: "#EDEDED", // MAIN BACKGROUND COLOR
+          300: "rgba(255, 255, 255, 0.1)", //TABLE COLUMNS
           400: "#f2f0f0",
-          500: "#141b2d",
-          600: "#434957",
-          700: "#727681",
-          800: "#a1a4ab",
+          500: "#1F1F43;", //PROVIDER OVERVIEW TITLE
+          600: "#176BF8", //BUTTON BACKGROUND COLOR
+          700: "rgba(255, 255, 255, 0.20);", //TABLE HEADER
+          800: "#141414;", //PROVIDER OVERVIEW SUBTITLE
           900: "#d0d1d5",
         },
         greenAccent: {
@@ -109,6 +120,17 @@ export const tokens = (mode) => ({
         blueAccent: {
           100: "#151632",
           200: "#2a2d64",
+          300: "#3e4396",
+          400: "#535ac8",
+          500: "#6870fa",
+          600: "#868dfb",
+          700: "#a4a9fc",
+          800: "#c3c6fd",
+          900: "#e1e2fe",
+        },
+        text: {
+          100: "#1F1F43",
+          200: "rgba(31, 31, 67, 0.80)",
           300: "#3e4396",
           400: "#535ac8",
           500: "#6870fa",

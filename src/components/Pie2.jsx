@@ -3,9 +3,22 @@ import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { mockPieData as data } from "../data/mockData";
 
-const Pie = () => {
+const Pie2 = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const CustomTooltip = ({ datum }) => (
+    <div
+      style={{
+        padding: "12px 16px",
+        background: "rgba(0, 0, 0, 0.9)",
+        borderRadius: "8px",
+        color: "white",
+      }}
+    >
+      <strong>{datum.id}</strong>: {datum.value}
+    </div>
+  );
 
   return (
     <ResponsivePie
@@ -19,7 +32,7 @@ const Pie = () => {
           },
           legend: {
             text: {
-              fill: colors,
+              fill: colors.grey[100],
             },
           },
           ticks: {
@@ -38,17 +51,18 @@ const Pie = () => {
           },
         },
       }}
-      margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
+      margin={{ top: 20, right: 130, bottom: 60, left: 30 }}
       innerRadius={0.9}
       padAngle={0}
       cornerRadius={0}
       activeOuterRadiusOffset={8}
-      colors={{ scheme: "nivo" }}
+      colors={({ id, data }) => data.color}
       borderWidth={1}
       borderColor={{
         from: "color",
         modifiers: [["darker", 0.2]],
       }}
+      tooltip={CustomTooltip}
       arcLinkLabelsSkipAngle={10}
       arcLinkLabelsTextColor={colors.grey[100]}
       arcLinkLabelsThickness={3}
@@ -63,16 +77,16 @@ const Pie = () => {
         {
           anchor: "right",
           direction: "column",
-          justify: false,
-          translateX: -190,
-          translateY: 25,
-          itemsSpacing: 20,
-          itemWidth: 100,
+          justifyLeft: true,
+          translateX: 100,
+          translateY: 0,
+          itemsSpacing: 15,
+          itemWidth: 70,
           itemHeight: 18,
-          itemTextColor: "#999",
+          itemTextColor: "white",
           itemDirection: "left-to-right",
           itemOpacity: 1,
-          symbolSize: 18,
+          symbolSize: 15,
           symbolShape: "square",
           effects: [
             {
@@ -88,4 +102,4 @@ const Pie = () => {
   );
 };
 
-export default Pie;
+export default Pie2;

@@ -13,16 +13,12 @@ const StatBox = ({ title, number, icon }) => {
           <Typography
             variant="h4"
             fontWeight="bold"
-            sx={{ color: colors.grey[100], display: "block" }}
+            sx={{ color: colors.text[100], display: "block" }}
           >
             {title}
           </Typography>
 
-          <Typography
-            mt={0.5}
-            variant="h4"
-            sx={{ color: colors.blueAccent[400] }}
-          >
+          <Typography mt={0.5} variant="h4" sx={{ color: colors.text[200] }}>
             {number}
           </Typography>
         </Box>
