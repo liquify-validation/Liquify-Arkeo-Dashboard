@@ -1,10 +1,9 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { Box, useTheme, Pagination } from "@mui/material";
 import { tokens } from "../theme";
 import { ProviderCard, Header, ProvidersBar, CircleIcon } from "../components";
 import { DataContext } from "../data/DataProvider.jsx";
 import { HexMap, HexMapLight } from "../assets";
-import { Link } from "react-router-dom";
 import { providersMockData } from "../data/mockData.js";
 
 const Providers = () => {
@@ -15,14 +14,11 @@ const Providers = () => {
 
   const data = useContext(DataContext);
 
-  // Assuming your data object has a grabProviders property containing the providers data
   const providerData = data.grabProviders || {};
   const providerKeys = Object.keys(providerData);
 
-  // Calculate total pages
   const totalPages = Math.ceil(providersMockData.length / cardsPerPage);
 
-  // Adjust the slicing to work with providerKeys
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
   const currentProviderKeys = providerKeys.slice(
@@ -30,7 +26,6 @@ const Providers = () => {
     indexOfLastCard
   );
 
-  // Change page handler
   const handleChangePage = (event, value) => {
     setCurrentPage(value);
   };
@@ -156,7 +151,6 @@ const Providers = () => {
           })}
         </Box>
 
-        {/* Pagination (Assuming static for simplicity, adjust according to data size/dynamic needs) */}
         <Box display="flex" justifyContent="center" mt={6} pb={4}>
           <Pagination
             count={totalPages}

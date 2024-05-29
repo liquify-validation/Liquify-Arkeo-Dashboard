@@ -1,6 +1,3 @@
-// CircleIcon.js
-import React from "react";
-
 const CircleIcon = ({ color }) => {
   return (
     <div

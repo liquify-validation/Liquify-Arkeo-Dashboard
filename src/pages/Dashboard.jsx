@@ -1,8 +1,7 @@
 import Header from "../components/Header";
-import React, { useContext } from "react";
+import { useContext } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
-import { mockProvidersData } from "../data/mockData";
 import { DataContext } from "../data/DataProvider";
 
 import {
@@ -19,7 +18,6 @@ const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const data = useContext(DataContext);
-  console.log("data", data);
 
   const networkData = data.grabNetworkData?.[0] || {};
   const numberOfProviders = networkData.number_of_providers || "Loading...";
@@ -84,7 +82,7 @@ const Dashboard = () => {
           >
             <Box>
               <StatBox
-                number={`${totalBondedValue}`} // Adding 'M' to signify millions
+                number={`${totalBondedValue}`}
                 title="TOTAL BONDED VALUE"
                 icon={<img src={BondedIcon} alt="Bonded Icon" />}
               />

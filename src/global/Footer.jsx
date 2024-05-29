@@ -62,14 +62,12 @@ const Footer = () => {
             rel="noopener noreferrer"
           >
             {" "}
-            {/* Replace with your link */}
             <IconButton aria-label="X" size="large">
               <XIcon fontSize="large" style={{ color: "white" }} />
             </IconButton>
           </Link>
           <Link href="mailto:email@example.com">
             {" "}
-            {/* Replace with your email */}
             <IconButton aria-label="Email" size="large">
               <EmailIcon fontSize="large" style={{ color: "white" }} />
             </IconButton>

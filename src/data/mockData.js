@@ -197,7 +197,7 @@ export const mockPieData = [
     id: "Fantom",
     label: "Fantom Opera",
     value: 36.6,
-    color: "hsla(223, 23%, 88%, 1)",
+    color: "hsla(223, 75%, 60%, 1)",
   },
   {
     id: "Bitcoin",

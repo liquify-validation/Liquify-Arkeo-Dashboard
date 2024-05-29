@@ -83,7 +83,7 @@ const Pie2 = () => {
           itemsSpacing: 15,
           itemWidth: 70,
           itemHeight: 18,
-          itemTextColor: "white",
+          itemTextColor: colors.grey[100],
           itemDirection: "left-to-right",
           itemOpacity: 1,
           symbolSize: 15,

@@ -1,7 +1,6 @@
-import React from "react";
 import { Grid, Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
-import BlockIcon from "../assets/currentblock_icon.svg"; // Import your SVGs like this
+import BlockIcon from "../assets/currentblock_icon.svg";
 import TaxIcon from "../assets/amtTaxed_icon.svg";
 import TimeIcon from "../assets/timeicon.svg";
 import ProviderIcon from "../assets/totalprovidericon.svg";

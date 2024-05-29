@@ -7,7 +7,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogContentText,
   DialogActions,
   Button,
   Tooltip,
@@ -16,6 +15,18 @@ import { DataContext } from "../data/DataProvider";
 import { tokens } from "../theme";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+
+const isValidHttpUrl = (string) => {
+  let url;
+
+  try {
+    url = new URL(string);
+  } catch (_) {
+    return false;
+  }
+
+  return url.protocol === "http:" || url.protocol === "https:";
+};
 
 const ProviderCard = ({
   provider,
@@ -40,24 +51,24 @@ const ProviderCard = ({
   const colors = tokens(theme.palette.mode);
   const [openDialog, setOpenDialog] = useState(false);
   const { grabProviders } = useContext(DataContext);
-  const statusColor = status === "ONLINE" ? "#2DFE54" : "red";
+  const statusColor = status === "ONLINE" ? "#0BDA51" : "red";
 
-  const providerData = grabProviders?.[provider]; // Assuming 'provider' is a unique key in your data structure
+  const providerData = grabProviders?.[provider];
   const firstEndpoint = providerData?.endpoints
     ? Object.keys(JSON.parse(providerData.endpoints))[0]
     : "";
 
+  const offlineReason = providerData?.offline_reason;
   const statusTooltip =
     status === "ONLINE"
       ? "Online"
-      : providerData?.offline_reason || "No offline reason provided";
+      : (offlineReason === "N/A" ? "Unknown" : offlineReason) ||
+        "No offline reason provided";
 
-  // Function to handle dialog open
   const handleDialogOpen = () => {
     setOpenDialog(true);
   };
 
-  // Function to handle dialog close
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
@@ -66,6 +77,16 @@ const ProviderCard = ({
     firstEndpoint.length > 50
       ? `${firstEndpoint.substring(0, 50)}...`
       : firstEndpoint;
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  };
+
+  const capitalizedProvider = /^[A-Za-z]/.test(provider)
+    ? capitalizeFirstLetter(provider)
+    : provider;
+
+  const isWebsiteValid = isValidHttpUrl(website);
 
   return (
     <Box
@@ -78,7 +99,7 @@ const ProviderCard = ({
       <Box display="flex" alignItems="center" gap="12px">
         <Box mt="1.5px">{companyIcon}</Box>
         <Typography variant="h4" fontWeight="bold">
-          {provider}
+          {capitalizedProvider}
         </Typography>
       </Box>
 
@@ -135,7 +156,7 @@ const ProviderCard = ({
       </Box>
       <Dialog open={openDialog} onClose={handleDialogClose}>
         <Box
-          className="gradient-table-mask"
+          className="gradient-border-mask"
           backgroundColor={colors.primary[200]}
         >
           <DialogTitle>Endpoints</DialogTitle>
@@ -233,7 +254,10 @@ const ProviderCard = ({
         justifyContent="space-between"
       >
         <Typography variant="p">ISP:</Typography>
-        <Typography variant="p" maxWidth={"250px"}>
+        <Typography
+          variant="p"
+          sx={{ width: "100%", textAlign: "right", maxWidth: "200px" }}
+        >
           {cloudBaremetal}
         </Typography>
       </Box>
@@ -253,7 +277,29 @@ const ProviderCard = ({
         justifyContent="space-between"
       >
         <Typography variant="p">Website:</Typography>
-        <Typography variant="p">{website}</Typography>
+        {isWebsiteValid ? (
+          <a
+            href={website}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              textDecoration: "none",
+              color: "#1d8aed",
+              zIndex: 1000,
+            }}
+          >
+            <Typography
+              variant="p"
+              style={{ color: theme.palette.primary.main }}
+            >
+              {website}
+            </Typography>
+          </a>
+        ) : (
+          <Typography variant="p" s>
+            {website || "N/A"}
+          </Typography>
+        )}
       </Box>
       <Box
         display="flex"
@@ -289,6 +335,7 @@ const ProviderCard = ({
               borderColor: statusColor,
               position: "relative",
               zIndex: 1300,
+              cursor: "pointer",
             }}
           >
             {status}

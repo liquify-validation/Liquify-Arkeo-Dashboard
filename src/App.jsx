@@ -65,7 +65,6 @@ function App() {
                     )}
                   </IconButton>
                   <Routes>
-                    {/* <Route path="/" element={<Homepage />} /> */}
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/explore" element={<Explore />} />
                     <Route path="/providers" element={<Providers />} />

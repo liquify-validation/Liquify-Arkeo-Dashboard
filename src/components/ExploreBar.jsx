@@ -1,12 +1,5 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  TextField,
-  Stack,
-  IconButton,
-  InputAdornment,
-} from "@mui/material";
+import { useState } from "react";
+import { Box, Button, TextField, Stack, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 
 const ExploreBar = () => {

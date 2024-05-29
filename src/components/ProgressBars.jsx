@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import { useContext, useMemo, useState } from "react";
 import {
   Box,
   Typography,
@@ -6,7 +6,6 @@ import {
   Stack,
   useTheme,
 } from "@mui/material";
-import GitHubIcon from "@mui/icons-material/GitHub";
 import { tokens } from "../theme";
 import { DataContext } from "../data/DataProvider";
 import {
@@ -31,6 +30,7 @@ const ProgressBars = () => {
   const colors = tokens(theme.palette.mode);
   const { numberOfServices } = useContext(DataContext);
   const isDarkMode = theme.palette.mode === "dark";
+  const [showAll, setShowAll] = useState(false);
 
   const iconMapping = {
     "arkeo-mainnet-fullnode": ArkeoIcon,
@@ -55,12 +55,10 @@ const ProgressBars = () => {
     "gaia-mainnet-grpc": isDarkMode ? CosmosIconDark : CosmosIconLight,
   };
 
-  // Process data to calculate relative counts and adjust service names
   const processedData = useMemo(() => {
     const services = Object.values(numberOfServices || {});
     const maxCount = Math.max(...services.map((s) => s.count));
 
-    // Map the services to include percentage calculation
     const mappedServices = services.map((service) => ({
       title: service.name
         .split("-")
@@ -68,25 +66,28 @@ const ProgressBars = () => {
         .join(" "),
       count: service.count,
       maxCount,
-      percentage: Math.round((service.count / maxCount) * 100), // This calculates the percentage
+      percentage: Math.round((service.count / maxCount) * 100),
     }));
 
-    // Sort the mapped services by percentage in descending order
     return mappedServices.sort((a, b) => b.percentage - a.percentage);
   }, [numberOfServices, isDarkMode]);
 
   const getIconSrc = (name) => {
     let iconName = name.toLowerCase().replace(/ /g, "-");
-    console.log("transformed icon name", iconName);
+
     if (iconName === "gaia") {
       return isDarkMode ? CosmosIconDark : CosmosIconLight;
     }
     return iconMapping[iconName];
   };
 
+  const displayedData = showAll ? processedData : processedData.slice(0, 5);
+
+  const toggleShowAll = () => setShowAll(!showAll);
+
   return (
-    <Box width="100%">
-      {processedData.map((item, index) => (
+    <Box width="100%" sx={{ zIndex: 1000 }}>
+      {displayedData.map((item, index) => (
         <Stack
           key={index}
           direction="row"
@@ -103,8 +104,6 @@ const ProgressBars = () => {
               padding: "1px",
             }}
           >
-            {" "}
-            {/* Fixed width for icon + title */}
             <img
               src={getIconSrc(item.title)}
               alt={`${item.title} Icon`}
@@ -128,13 +127,11 @@ const ProgressBars = () => {
               borderRadius: 10,
             }}
           >
-            {" "}
-            {/* Flex grow for progress bar */}
             <LinearProgress
               variant="determinate"
               value={item.percentage}
               sx={{
-                width: "100%", // Ensure progress bar takes the full width of its container
+                width: "100%",
                 height: 15,
                 borderRadius: 25,
                 backgroundColor: "#D9D9D9",
@@ -151,10 +148,24 @@ const ProgressBars = () => {
             color={colors.text[100]}
             sx={{ minWidth: "50px", textAlign: "right" }}
           >
-            {`${item.count}/${item.maxCount}`}
+            {`${item.count}`}
           </Typography>
         </Stack>
       ))}
+      {processedData.length > 5 && (
+        <Typography
+          onClick={toggleShowAll}
+          sx={{
+            cursor: "pointer",
+            color: theme.palette.primary.main,
+            mt: 2,
+            textAlign: "center",
+            textDecoration: "underline",
+          }}
+        >
+          {showAll ? "View Less" : "View All"}
+        </Typography>
+      )}
     </Box>
   );
 };

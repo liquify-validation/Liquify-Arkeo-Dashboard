@@ -1,9 +1,7 @@
-import React from "react";
 import Button from "@mui/material/Button";
 import { styled } from "@mui/material/styles";
-import { useTheme, Pagination } from "@mui/material";
+import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
-import Icon from "@mui/icons-material/Add"; // This is a placeholder, ensure you replace or remove as needed
 
 const CustomButton = styled((props) => {
   const theme = useTheme();

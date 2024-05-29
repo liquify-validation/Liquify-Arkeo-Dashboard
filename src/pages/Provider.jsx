@@ -11,7 +11,6 @@ const Provider = () => {
 
   const location = useLocation();
   const providerName = location.state?.providerName;
-  console.log("provider", providerName);
 
   const hexmapClassName = `hexmap-bg ${
     theme.palette.mode === "dark" ? "hexmap-dark" : "hexmap-light"

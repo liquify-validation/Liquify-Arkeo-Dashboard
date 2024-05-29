@@ -1,8 +1,7 @@
-import React from "react";
-import { Box, Button, Typography, useTheme } from "@mui/material";
+import { Box, Button, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { Header, LeaderboardTable } from "../components";
-import { LiquifyIcon, LiquifyIconDark, HexMap, HexMapLight } from "../assets";
+import { HexMap, HexMapLight } from "../assets";
 
 const Leaderboard = () => {
   const theme = useTheme();
@@ -16,7 +15,7 @@ const Leaderboard = () => {
     theme.palette.mode === "dark" ? HexMap : HexMapLight;
 
   const redirectToProviders = () => {
-    window.location.href = "/providers"; // Change the current window location to /providers
+    window.location.href = "/providers";
   };
 
   return (
@@ -41,12 +40,12 @@ const Leaderboard = () => {
           ml={2}
         >
           <Header title="Leaderboard - Top Earners" />
-          {/* Back Button on the right */}
+
           <Button
             onClick={redirectToProviders}
             sx={{
               height: "fit-content",
-              color: theme.palette.mode === "dark" ? "white" : "black", // Adjust color based on theme
+              color: theme.palette.mode === "dark" ? "white" : "black",
             }}
           >
             Back

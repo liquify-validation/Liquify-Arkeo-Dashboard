@@ -2,7 +2,6 @@ import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../theme";
 import { leaderboardData } from "../data/mockData";
-import { Header } from "../components";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 
 const LeaderboardTable = () => {
