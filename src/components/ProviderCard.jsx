@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -11,20 +11,21 @@ import {
   Button,
   Tooltip,
 } from "@mui/material";
-import { DataContext } from "../data/DataProvider";
 import { tokens } from "../theme";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { useNavigate } from "react-router-dom";
+
+// TO DO - Make text so can be copied
+// TO DO - Swap out any mock data and logic for open and online
 
 const isValidHttpUrl = (string) => {
   let url;
-
   try {
     url = new URL(string);
   } catch (_) {
     return false;
   }
-
   return url.protocol === "http:" || url.protocol === "https:";
 };
 
@@ -46,19 +47,21 @@ const ProviderCard = ({
   active,
   freeUsageLimit,
   status,
+  providerData,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [openDialog, setOpenDialog] = useState(false);
-  const { grabProviders } = useContext(DataContext);
-  const statusColor = status === "ONLINE" ? "#0BDA51" : "red";
+  const [endpointsOpen, setEndpointsOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const providerData = grabProviders?.[provider];
-  const firstEndpoint = providerData?.endpoints
-    ? Object.keys(JSON.parse(providerData.endpoints))[0]
-    : "";
+  const parsedEndpoints = providerData?.endpoints
+    ? JSON.parse(providerData.endpoints)
+    : {};
+  const firstEndpoint = parsedEndpoints ? Object.keys(parsedEndpoints)[0] : "";
 
   const offlineReason = providerData?.offline_reason;
+  const statusColor = status === "ONLINE" ? "#0BDA51" : "red";
   const statusTooltip =
     status === "ONLINE"
       ? "Online"
@@ -68,25 +71,35 @@ const ProviderCard = ({
   const handleDialogOpen = () => {
     setOpenDialog(true);
   };
-
   const handleDialogClose = () => {
     setOpenDialog(false);
   };
 
   const displayedEndpoint =
-    firstEndpoint.length > 50
+    firstEndpoint && firstEndpoint.length > 50
       ? `${firstEndpoint.substring(0, 50)}...`
       : firstEndpoint;
 
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
-
   const capitalizedProvider = /^[A-Za-z]/.test(provider)
     ? capitalizeFirstLetter(provider)
     : provider;
 
   const isWebsiteValid = isValidHttpUrl(website);
+
+  const providerId = providerData?.provider_pubkey;
+
+  const handleContractsClick = () => {
+    navigate(
+      `/contracts/${providerId}?location=${encodeURIComponent(
+        location
+      )}&isp=${encodeURIComponent(
+        cloudBaremetal
+      )}&providerName=${encodeURIComponent(capitalizedProvider)}`
+    );
+  };
 
   return (
     <Box
@@ -95,6 +108,7 @@ const ProviderCard = ({
       height="auto"
       minHeight="525px"
       className="gradient-border-mask"
+      sx={{ userSelect: "text" }}
     >
       <Box display="flex" alignItems="center" gap="12px">
         <Box mt="1.5px">{companyIcon}</Box>
@@ -161,13 +175,7 @@ const ProviderCard = ({
         >
           <DialogTitle>Endpoints</DialogTitle>
           <DialogContent>
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 2,
-              }}
-            >
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <Box
                 sx={{
                   display: "flex",
@@ -179,28 +187,25 @@ const ProviderCard = ({
                 <Typography>Endpoint:</Typography>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                   <Typography>{displayedEndpoint}</Typography>
-                  <Tooltip title="Copy to clipboard">
-                    <IconButton
-                      onClick={() => {
-                        navigator.clipboard
-                          .writeText(firstEndpoint)
-                          .catch((err) => {
-                            console.error("Could not copy text: ", err);
-                          });
-                      }}
-                      size="small"
-                    >
-                      <ContentCopyIcon />
-                    </IconButton>
-                  </Tooltip>
+                  {firstEndpoint && (
+                    <Tooltip title="Copy to clipboard">
+                      <IconButton
+                        onClick={() => {
+                          navigator.clipboard
+                            .writeText(firstEndpoint)
+                            .catch((err) => {
+                              console.error("Could not copy text: ", err);
+                            });
+                        }}
+                        size="small"
+                      >
+                        <ContentCopyIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </Box>
               </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
+              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography>Free Usage Limit:</Typography>
                 <Typography>{freeUsageLimit}</Typography>
               </Box>
@@ -261,15 +266,6 @@ const ProviderCard = ({
           {cloudBaremetal}
         </Typography>
       </Box>
-      {/* <Box
-        mt={1.5}
-        display="flex"
-        flexDirection="row"
-        justifyContent="space-between"
-      >
-        <Typography variant="p">Priced:</Typography>
-        <Typography variant="p">${priced}</Typography>
-      </Box> */}
       <Box
         mt={1.5}
         display="flex"
@@ -282,11 +278,7 @@ const ProviderCard = ({
             href={website}
             target="_blank"
             rel="noopener noreferrer"
-            style={{
-              textDecoration: "none",
-              color: "#1d8aed",
-              zIndex: 1000,
-            }}
+            style={{ textDecoration: "none", color: "#1d8aed", zIndex: 1000 }}
           >
             <Typography
               variant="p"
@@ -296,21 +288,23 @@ const ProviderCard = ({
             </Typography>
           </a>
         ) : (
-          <Typography variant="p" s>
-            {website || "N/A"}
-          </Typography>
+          <Typography variant="p">{website || "N/A"}</Typography>
         )}
       </Box>
       <Box
-        display="flex"
-        gap="15px"
-        justifyContent="flex-start"
-        flexDirection="row"
+        sx={{
+          position: "absolute",
+          bottom: "20px",
+          left: "25px",
+          right: "25px",
+          display: "flex",
+          alignItems: "center",
+        }}
       >
         <Box
-          p="4px"
+          p="8px"
           mt="20px"
-          px="7px"
+          px="15px"
           color="black"
           display="inline-block"
           justifyContent="center"
@@ -321,9 +315,10 @@ const ProviderCard = ({
         </Box>
         <Tooltip title={statusTooltip}>
           <Box
-            p="4px"
+            p="8px"
+            marginLeft="20px"
             mt="20px"
-            px="6px"
+            px="20px"
             display="inline-block"
             justifyContent="center"
             color={statusColor}
@@ -341,6 +336,23 @@ const ProviderCard = ({
             {status}
           </Box>
         </Tooltip>
+        <Box sx={{ marginLeft: "auto", mt: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleContractsClick}
+            sx={{
+              userSelect: "none",
+              backgroundColor: "#166cf9",
+              borderRadius: "20px",
+              textTransform: "uppercase",
+              fontWeight: "semibold",
+              color: "white",
+            }}
+          >
+            Contracts
+          </Button>
+        </Box>
       </Box>
     </Box>
   );

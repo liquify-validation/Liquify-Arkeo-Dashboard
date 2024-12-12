@@ -10,7 +10,7 @@ const ProvidersBar = () => {
       display="flex"
       justifyContent="space-between"
       alignItems="center"
-      width="100%"
+      width="94%"
     >
       <Link to="/leaderboard" style={{ textDecoration: "none" }}>
         <CustomButton

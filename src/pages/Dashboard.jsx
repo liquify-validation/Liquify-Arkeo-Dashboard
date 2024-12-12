@@ -1,8 +1,8 @@
 import Header from "../components/Header";
-import { useContext } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
-import { DataContext } from "../data/DataProvider";
+import { useTotalProviders } from "../hooks/useTotalProviders";
+import { useTotalBondedValue } from "../hooks/useTotalBondedValue";
 
 import {
   TimeIcon,
@@ -17,12 +17,20 @@ import { Pie2, StatBox, ProgressBars } from "../components";
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const data = useContext(DataContext);
 
-  const networkData = data.grabNetworkData?.[0] || {};
-  const numberOfProviders = networkData.number_of_providers || "Loading...";
-  const numberOfServices = networkData.number_of_services || "Loading...";
-  const totalBondedValue = (networkData.bond / 1e6).toFixed(2) || "Loading...";
+  const {
+    data: totalProviders,
+    isLoading: loadingProviders,
+    error: errorProviders,
+  } = useTotalProviders();
+
+  const {
+    data: totalBondedValue,
+    isLoading: loadingBonded,
+    error: errorBonded,
+  } = useTotalBondedValue();
+
+  const numberOfServices = "12";
 
   const hexmapClassName = `hexmap-bg ${
     theme.palette.mode === "dark" ? "hexmap-dark" : "hexmap-light"
@@ -65,7 +73,13 @@ const Dashboard = () => {
           >
             <Box>
               <StatBox
-                number={numberOfProviders}
+                number={
+                  loadingProviders
+                    ? "Loading..."
+                    : errorProviders
+                    ? "Error"
+                    : totalProviders
+                }
                 title="TOTAL PROVIDERS"
                 progress=""
                 increase="+12%"
@@ -82,7 +96,13 @@ const Dashboard = () => {
           >
             <Box>
               <StatBox
-                number={`${totalBondedValue}`}
+                number={
+                  loadingBonded
+                    ? "Loading..."
+                    : errorBonded
+                    ? "Error"
+                    : totalBondedValue
+                }
                 title="TOTAL BONDED VALUE"
                 icon={<img src={BondedIcon} alt="Bonded Icon" />}
               />
@@ -161,7 +181,7 @@ const Dashboard = () => {
               color={colors.text[100]}
               margin="30px"
             >
-              Request Distribution by networks
+              Request Distribution by Networks
             </Typography>
             <Box
               sx={{ maxWidth: "600px", height: "300px" }}

@@ -28,6 +28,7 @@ export const DataProvider = ({ children }) => {
           grabNetworkData: jsonData[2],
         };
 
+        console.log(fetchedData);
         setData(fetchedData);
       } catch (error) {
         console.error("Error fetching data:", error);

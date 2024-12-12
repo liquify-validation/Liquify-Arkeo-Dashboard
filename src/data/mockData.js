@@ -183,7 +183,7 @@ export const leaderboardData = [
 export const mockPieData = [
   {
     id: "Ethereum",
-    label: "ethereum",
+    label: "Ethereum",
     value: 25,
     color: "hsla(218, 94%, 53%, 1)",
   },

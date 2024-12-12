@@ -24,6 +24,7 @@ import OptimismIcon from "./optimism-icon.svg";
 import OsmosisIcon from "./Osmosis_Icon.svg";
 import PolygonIcon from "./Polygon_Icon_Purple_White_Rn.svg";
 import ThorchainIcon from "./thornode-icon.svg";
+import AllProvidersIcon from "./allproviders_icon.svg";
 
 export {
   ArkeoLogo,
@@ -52,4 +53,5 @@ export {
   OsmosisIcon,
   PolygonIcon,
   ThorchainIcon,
+  AllProvidersIcon,
 };

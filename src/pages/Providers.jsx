@@ -1,34 +1,24 @@
-import { useState, useContext } from "react";
-import { Box, useTheme, Pagination } from "@mui/material";
+import { useState, useMemo } from "react";
+import {
+  Box,
+  useTheme,
+  Pagination,
+  Select,
+  MenuItem,
+  Typography,
+} from "@mui/material";
 import { tokens } from "../theme";
 import { ProviderCard, Header, ProvidersBar, CircleIcon } from "../components";
-import { DataContext } from "../data/DataProvider.jsx";
 import { HexMap, HexMapLight } from "../assets";
-import { providersMockData } from "../data/mockData.js";
+import { useProviders } from "../hooks/useProviders";
 
 const Providers = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [currentPage, setCurrentPage] = useState(1);
-  const cardsPerPage = 8;
+  const { data: providerData, isLoading, error } = useProviders();
 
-  const data = useContext(DataContext);
-
-  const providerData = data.grabProviders || {};
-  const providerKeys = Object.keys(providerData);
-
-  const totalPages = Math.ceil(providersMockData.length / cardsPerPage);
-
-  const indexOfLastCard = currentPage * cardsPerPage;
-  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
-  const currentProviderKeys = providerKeys.slice(
-    indexOfFirstCard,
-    indexOfLastCard
-  );
-
-  const handleChangePage = (event, value) => {
-    setCurrentPage(value);
-  };
+  const [cardsPerPage, setCardsPerPage] = useState(8);
 
   const hexmapClassName = `hexmap-bg ${
     theme.palette.mode === "dark" ? "hexmap-dark" : "hexmap-light"
@@ -36,6 +26,120 @@ const Providers = () => {
 
   const backgroundImageUrl =
     theme.palette.mode === "dark" ? HexMap : HexMapLight;
+
+  if (isLoading) {
+    return (
+      <Box
+        className={hexmapClassName}
+        sx={{
+          position: "relative",
+          width: "100%",
+          backgroundImage: `url(${backgroundImageUrl})`,
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center",
+          backgroundSize: "70%",
+          zIndex: 0,
+          overflow: "hidden",
+        }}
+      >
+        <Box m="40px">
+          <Header title="Providers" />
+          <Box mt={4}>Loading providers...</Box>
+        </Box>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box
+        className={hexmapClassName}
+        sx={{
+          backgroundImage: `url(${backgroundImageUrl})`,
+          backgroundRepeat: "no-repeat",
+          backgroundPosition: "center 70%",
+          width: "100%",
+          height: "100%",
+          position: "relative",
+          zIndex: 0,
+        }}
+      >
+        <Box m="40px">
+          <Header title="Providers" />
+          <Box mt={4} color="red">
+            Error loading providers!
+          </Box>
+        </Box>
+      </Box>
+    );
+  }
+
+  const providerKeys = Object.keys(providerData);
+  const totalProviders = providerKeys.length;
+
+  const providersArray = providerKeys.map((key) => {
+    const p = providerData[key];
+    const name = p.provider_name || key;
+    return { key, name };
+  });
+
+  const ipRegex = /^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/;
+  const namedProviders = providersArray.filter((p) => !ipRegex.test(p.name));
+  const ipProviders = providersArray.filter((p) => ipRegex.test(p.name));
+
+  namedProviders.sort((a, b) => a.name.localeCompare(b.name));
+  ipProviders.sort((a, b) => a.name.localeCompare(b.name));
+
+  const sortedProviders = [...namedProviders, ...ipProviders];
+
+  const increments = [];
+  for (let i = 8; i <= 48; i += 4) {
+    increments.push(i);
+  }
+
+  let displayOptions = [];
+  if (totalProviders < 8) {
+    displayOptions = ["All"];
+  } else {
+    displayOptions = increments.filter((num) => num <= totalProviders);
+
+    if (displayOptions.length === 0) {
+      displayOptions = [8];
+    }
+
+    if (displayOptions.includes(totalProviders)) {
+      displayOptions = displayOptions.filter((num) => num < totalProviders);
+      displayOptions.push("All");
+    } else {
+      const largestIncrement = displayOptions[displayOptions.length - 1];
+      if (totalProviders > largestIncrement || totalProviders > 48) {
+        displayOptions.push("All");
+      }
+    }
+  }
+
+  const handleCardsPerPageChange = (event) => {
+    const value = event.target.value;
+    if (value === "All") {
+      setCardsPerPage(totalProviders);
+    } else {
+      setCardsPerPage(value);
+    }
+    setCurrentPage(1);
+  };
+
+  const totalPages = Math.ceil(totalProviders / cardsPerPage);
+  const indexOfLastCard = currentPage * cardsPerPage;
+  const indexOfFirstCard = indexOfLastCard - cardsPerPage;
+
+  const currentProviders =
+    cardsPerPage === totalProviders
+      ? sortedProviders
+      : sortedProviders.slice(indexOfFirstCard, indexOfLastCard);
+
+  const handleChangePage = (event, value) => {
+    setCurrentPage(value);
+  };
 
   const colorPalette = [
     "#ffadad",
@@ -47,21 +151,6 @@ const Providers = () => {
     "#bdb2ff",
     "#ffc6ff",
   ];
-
-  // Function to assign an SVG icon based on the provider's name
-  // const getProviderIcon = (providerName) => {
-  //   switch (providerName) {
-  //     // case "Provider_1":
-  //     //   return <Provider1Icon />;
-  //     // case "Provider_2":
-  //     //   return <Provider2Icon />;
-  //     // case "Provider_3":
-  //     //   return <Provider3Icon />;
-
-  //     default:
-  //       return <LiquifyIcon />;
-  //   }
-  // };
 
   return (
     <Box
@@ -81,11 +170,27 @@ const Providers = () => {
           <Header title="Providers" />
         </Box>
         <Box
-          justifyContent="space-between"
-          alignItems="center"
           marginTop="35px"
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
         >
           <ProvidersBar />
+          <Box display="flex" alignItems="center" sx={{ gap: "20px" }}>
+            <Typography>Show:</Typography>
+            <Select
+              value={cardsPerPage === totalProviders ? "All" : cardsPerPage}
+              onChange={handleCardsPerPageChange}
+              size="small"
+              sx={{ backgroundColor: colors.primary[300] }}
+            >
+              {displayOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option === "All" ? "All" : `${option}`}
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
         </Box>
 
         <Box
@@ -95,56 +200,51 @@ const Providers = () => {
           gap="2rem"
           mt={5}
         >
-          {/* <Link
-              to={{
-                pathname: "/provider",
-                state: { providerName: provider.provider },
-              }}
-              key={index}
-              style={{
-                textDecoration: "none",
-                color: "inherit",
-                gridColumn: "span 3",
-              }}
-            >  */}
-          {currentProviderKeys.map((key, index) => {
-            const provider = providerData[key];
+          {currentProviders.map((p, index) => {
+            const provider = providerData[p.key];
             const endpoints = JSON.parse(provider.endpoints || "{}");
             const isOnline = !Object.values(endpoints).some(
               (endpoint) => endpoint.status === "OFFLINE"
             );
 
+            const contracts = JSON.parse(provider.contracts || "{}");
+            const openContracts = Object.keys(contracts).length;
+            const age = provider.last_update ? provider.last_update : "N/A";
+            const uptime = provider.uptime ? provider.uptime : "N/A";
+
             return (
               <Box
-                key={key}
-                style={{
+                key={p.key}
+                sx={{
                   textDecoration: "none",
                   color: "inherit",
                   gridColumn: "span 3",
+                  pointerEvents: "auto",
                 }}
               >
                 <ProviderCard
-                  provider={provider.provider_name || key}
+                  provider={provider.provider_name || p.key}
                   companyIcon={
                     <CircleIcon
                       color={colorPalette[index % colorPalette.length]}
                     />
                   }
-                  validationDate={provider.description}
+                  validationDate={provider.description || "N/A"}
                   website={provider.website}
-                  freeUsageLimit={provider.free_tier_rate_limit}
-                  openContracts={"0"}
+                  freeUsageLimit={provider.free_tier_rate_limit || "N/A"}
+                  openContracts={openContracts}
                   endpoints={provider.endpoints}
-                  age={"0"}
-                  uptime={"0"}
-                  amountTaxed={provider.amountTaxed}
-                  location={provider.location}
+                  age={age}
+                  uptime={uptime}
+                  amountTaxed={provider.amountTaxed || "N/A"}
+                  location={provider.location || "N/A"}
                   renewedContracts={"0"}
-                  cloudBaremetal={provider.isp}
+                  cloudBaremetal={provider.isp || "N/A"}
                   priced={provider.priced}
                   open={provider.open}
                   active={provider.active}
                   status={isOnline ? "ONLINE" : "OFFLINE"}
+                  providerData={provider}
                 />
               </Box>
             );

@@ -1,20 +1,12 @@
 import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
-import { tokens } from "../theme";
-import ExploreOutlinedIcon from "@mui/icons-material/ExploreOutlined"; //explore icon
 import DashboardIcon from "@mui/icons-material/Dashboard";
-// import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined"; // logout
-import WorkspacesOutlinedIcon from "@mui/icons-material/WorkspacesOutlined"; // providers to be changed
-import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import ArrowCircleRightIcon from "@mui/icons-material/ArrowCircleRight";
-import ArrowCircleLeftIcon from "@mui/icons-material/ArrowCircleLeft";
+import WorkspacesOutlinedIcon from "@mui/icons-material/WorkspacesOutlined";
 import ArticleIcon from "@mui/icons-material/Article";
-import PieChartIcon from "@mui/icons-material/PieChart";
-import { ArkeoLogo } from "../assets";
-import { ArkeoIcon } from "../assets";
+import { ArkeoLogo, ArkeoIcon, AllProvidersIcon } from "../assets";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   return (
@@ -24,12 +16,13 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
       onClick={() => setSelected(title)}
       icon={icon}
     >
-      <Typography>{title}</Typography> <Link to={to} />
+      <Typography>{title}</Typography>
+      <Link to={to} />
     </MenuItem>
   );
 };
 
-const Sidebar = ({ isSidebar, setIsSidebar }) => {
+const Sidebar = ({ isSidebar }) => {
   const [selected, setSelected] = useState("Dashboard");
 
   return (
@@ -39,59 +32,90 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
         "& .pro-sidebar-inner": {
           background: `#21233F`,
         },
-        "& .pro-icon-wrapper": { backgroundColor: "transparent !important" },
+
+        "& .pro-icon-wrapper": {
+          backgroundColor: "transparent !important",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        },
+
         "& .pro-inner-item": {
-          padding: "5px 15px 5px 20px !important",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          flexDirection: "row",
+          padding: "10px 20px !important",
+          marginLeft: "20px",
           marginBottom: "10px",
+          textAlign: "left",
+          color: "white",
+          transition: "all 0.3s ease",
         },
         "& .pro-inner-item:hover": {
           color: "#868dfb !important",
         },
+
         "& .pro-menu-item.active": {
-          boxSizing: "border-box",
-          backgroundColor: "#176BF8",
-          color: "#FFF;",
-          borderRadius: "20px",
-          width: "90%",
-          transition: "background-color 500ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+          backgroundColor: "transparent !important",
+        },
+        "& .pro-menu-item.active .pro-icon-wrapper svg, & .pro-menu-item.active .pro-icon-wrapper img":
+          {
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#176BF8",
+            borderRadius: "25%",
+            padding: "10px",
+            overflow: "visible",
+            boxSizing: "content-box",
+          },
+
+        "& .pro-sidebar.collapsed": {},
+
+        "& .pro-sidebar.collapsed .pro-inner-item": {
+          justifyContent: "center",
+          padding: "15px 0 !important",
+          textAlign: "center",
+        },
+        "& .pro-sidebar.collapsed .pro-inner-item .MuiTypography-root": {
+          display: "none",
+        },
+        "& .pro-sidebar.collapsed .pro-icon-wrapper svg, & .pro-sidebar.collapsed .pro-icon-wrapper img":
+          {
+            width: "35px",
+            height: "35px",
+          },
+        "& .pro-sidebar:not(.collapsed) .pro-inner-item .MuiTypography-root": {
+          marginLeft: "15px",
         },
       }}
     >
       <ProSidebar collapsed={isSidebar}>
         <Menu iconshape="square">
-          <MenuItem style={{ margin: "10px 0 40px 0px", color: "white" }}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="left"
-              >
-                {isSidebar ? (
-                  <img
-                    src={ArkeoIcon}
-                    alt="Arkeo Icon"
-                    style={{ width: "30px" }}
-                  />
-                ) : (
-                  <img
-                    src={ArkeoLogo}
-                    alt="Arkeo Logo"
-                    style={{ width: "150px", marginLeft: "25px" }}
-                  />
-                )}
-              </Box>
+          <MenuItem style={{ margin: "10px 0 50px 0", color: "white" }}>
+            <Box display="flex" justifyContent="left" alignItems="center">
+              {isSidebar ? (
+                <img
+                  src={ArkeoIcon}
+                  alt="Arkeo Icon"
+                  style={{ width: "30px" }}
+                />
+              ) : (
+                <img
+                  src={ArkeoLogo}
+                  alt="Arkeo Logo"
+                  style={{ width: "150px" }}
+                />
+              )}
             </Box>
           </MenuItem>
 
-          <Box paddingLeft={isSidebar ? undefined : "10%"}>
+          <Box>
             <Item
               title="Dashboard"
               to="/"
-              icon={<DashboardIcon />}
+              icon={<DashboardIcon style={{ width: "30px", height: "30px" }} />}
               selected={selected}
               setSelected={setSelected}
             />
@@ -99,34 +123,36 @@ const Sidebar = ({ isSidebar, setIsSidebar }) => {
             <Item
               title="Providers"
               to="/providers"
-              icon={<WorkspacesOutlinedIcon />}
+              icon={
+                <WorkspacesOutlinedIcon
+                  style={{ width: "30px", height: "30px" }}
+                />
+              }
               selected={selected}
               setSelected={setSelected}
             />
 
-            {/* <Item
-              title="Explore"
-              to="/explore"
-              icon={<ExploreOutlinedIcon />}
+            <Item
+              title="Contracts"
+              to="/contracts"
+              icon={
+                <img
+                  src={AllProvidersIcon}
+                  alt="All Providers"
+                  style={{ width: "30px", height: "30px" }}
+                />
+              }
               selected={selected}
               setSelected={setSelected}
-            /> */}
+            />
 
             <Item
               title="Docs"
               to="/docs"
-              icon={<ArticleIcon />}
+              icon={<ArticleIcon style={{ width: "30px", height: "30px" }} />}
               selected={selected}
               setSelected={setSelected}
             />
-
-            {/* <Item
-              title="Provider"
-              to="/provider"
-              icon={<PieChartIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
           </Box>
         </Menu>
       </ProSidebar>

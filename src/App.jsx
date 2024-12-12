@@ -19,7 +19,13 @@ import {
   PieChart,
   Docs,
   Leaderboard,
+  ProvidersTable,
+  Contract,
+  AllContracts,
 } from "./pages/";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -29,7 +35,7 @@ function App() {
 
   return (
     <>
-      <DataProvider>
+      <QueryClientProvider client={queryClient}>
         <ColorModeContext.Provider value={colorMode}>
           <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -68,6 +74,16 @@ function App() {
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/explore" element={<Explore />} />
                     <Route path="/providers" element={<Providers />} />
+                    <Route
+                      path="/providers-statistics"
+                      element={<ProvidersTable />}
+                    />
+                    <Route
+                      path="/contracts/:providerId"
+                      element={<Contract />}
+                    />
+                    <Route path="/contracts" element={<AllContracts />} />
+
                     <Route path="/provider" element={<Provider />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/piechart" element={<PieChart />} />
@@ -80,7 +96,7 @@ function App() {
             </Box>
           </ThemeProvider>
         </ColorModeContext.Provider>
-      </DataProvider>
+      </QueryClientProvider>
     </>
   );
 }

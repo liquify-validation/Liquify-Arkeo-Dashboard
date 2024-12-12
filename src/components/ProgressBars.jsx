@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Box,
   Typography,
@@ -7,7 +7,6 @@ import {
   useTheme,
 } from "@mui/material";
 import { tokens } from "../theme";
-import { DataContext } from "../data/DataProvider";
 import {
   BitcoinIcon,
   EthereumIcon,
@@ -24,13 +23,42 @@ import {
   BCHIcon,
   ArkeoIcon,
 } from "../assets";
+import { useNumberOfServices } from "../hooks/useNumberOfServices";
 
 const ProgressBars = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const { numberOfServices } = useContext(DataContext);
   const isDarkMode = theme.palette.mode === "dark";
   const [showAll, setShowAll] = useState(false);
+
+  const { data: numberOfServices, isLoading, error } = useNumberOfServices();
+
+  const processedData = useMemo(() => {
+    if (!numberOfServices || !Object.keys(numberOfServices).length) return [];
+
+    const services = Object.values(numberOfServices);
+    const maxCount = Math.max(...services.map((s) => s.count));
+
+    const mappedServices = services.map((service) => ({
+      title: service.name
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" "),
+      count: service.count,
+      maxCount,
+      percentage: Math.round((service.count / maxCount) * 100),
+    }));
+
+    return mappedServices.sort((a, b) => b.percentage - a.percentage);
+  }, [numberOfServices]);
+
+  if (isLoading) {
+    return <Typography>Loading services...</Typography>;
+  }
+
+  if (error) {
+    return <Typography>Error loading services</Typography>;
+  }
 
   const iconMapping = {
     "arkeo-mainnet-fullnode": ArkeoIcon,
@@ -54,23 +82,6 @@ const ProgressBars = () => {
     "optimism-mainnet-unchained": OptimismIcon,
     "gaia-mainnet-grpc": isDarkMode ? CosmosIconDark : CosmosIconLight,
   };
-
-  const processedData = useMemo(() => {
-    const services = Object.values(numberOfServices || {});
-    const maxCount = Math.max(...services.map((s) => s.count));
-
-    const mappedServices = services.map((service) => ({
-      title: service.name
-        .split("-")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" "),
-      count: service.count,
-      maxCount,
-      percentage: Math.round((service.count / maxCount) * 100),
-    }));
-
-    return mappedServices.sort((a, b) => b.percentage - a.percentage);
-  }, [numberOfServices, isDarkMode]);
 
   const getIconSrc = (name) => {
     let iconName = name.toLowerCase().replace(/ /g, "-");

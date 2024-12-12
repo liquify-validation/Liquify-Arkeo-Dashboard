@@ -13,6 +13,8 @@ import ProviderOverview from "./ProviderOverview";
 import CustomButton from "./CustomButton";
 import LeaderboardTable from "./LeaderboardTable";
 import CircleIcon from "./CircleIcon";
+import ContractTable from "./ContractTable";
+import AllContractsTable from "./AllContractsTable";
 
 export {
   Pie,
@@ -30,4 +32,6 @@ export {
   CustomButton,
   LeaderboardTable,
   CircleIcon,
+  ContractTable,
+  AllContractsTable,
 };
