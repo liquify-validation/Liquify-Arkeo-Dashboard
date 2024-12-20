@@ -1,21 +1,152 @@
-import { Box, Typography } from "@mui/material";
+import React, { useState, useMemo } from "react";
+import { Box, Typography, useTheme } from "@mui/material";
+import { tokens } from "../theme";
 import { useAllContracts } from "../hooks/useAllContracts";
-import AllContractsTable from "../components/AllContractsTable";
+import { useActiveContracts } from "../hooks/useActiveContracts";
+import { useCompletedContracts } from "../hooks/useCompletedContracts";
+import {
+  AllContractsTable,
+  ScrollableStatsCardSection,
+  ColumnVisibilityToggle,
+  ContractsFilterButtonGroup,
+} from "../components";
+
+import { HexMap, HexMapLight } from "../assets";
 
 const AllContracts = () => {
-  const { data: contractsData, isLoading, error } = useAllContracts();
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
-  if (isLoading) return <Typography>Loading all contracts...</Typography>;
+  const {
+    data: allData,
+    isLoading: allLoading,
+    error: allError,
+  } = useAllContracts();
+
+  const {
+    data: activeData,
+    isLoading: activeLoading,
+    error: activeError,
+  } = useActiveContracts();
+
+  const {
+    data: completedData,
+    isLoading: completedLoading,
+    error: completedError,
+  } = useCompletedContracts();
+
+  const [filterType, setFilterType] = useState("ALL");
+
+  const { contractsData, isLoading, error } = useMemo(() => {
+    if (filterType === "ALL") {
+      return {
+        contractsData: allData,
+        isLoading: allLoading,
+        error: allError,
+      };
+    } else if (filterType === "ACTIVE") {
+      return {
+        contractsData: activeData,
+        isLoading: activeLoading,
+        error: activeError,
+      };
+    } else {
+      return {
+        contractsData: completedData,
+        isLoading: completedLoading,
+        error: completedError,
+      };
+    }
+  }, [
+    filterType,
+    allData,
+    allLoading,
+    allError,
+    activeData,
+    activeLoading,
+    activeError,
+    completedData,
+    completedLoading,
+    completedError,
+  ]);
+
+  const initialColumns = [
+    { field: "id", headerName: "ID", flex: 1 },
+    { field: "serviceNumber", headerName: "Service", flex: 1 },
+    { field: "providerShort", headerName: "Provider ID", flex: 1 },
+    { field: "providerName", headerName: "Provider Name", flex: 1 },
+    { field: "duration", headerName: "Duration (blocks)", flex: 1 },
+    { field: "contractCost", headerName: "Contract Cost", flex: 1 },
+    { field: "callsSubmitted", headerName: "# of Calls Submitted", flex: 1 },
+    { field: "timeRemaining", headerName: "Time Remaining", flex: 1 },
+    { field: "queries", headerName: "Queries Per Minute", flex: 1 },
+    { field: "type", headerName: "Type", flex: 1 },
+    { field: "status", headerName: "Status", flex: 1 },
+  ];
+
+  const [visibleColumns, setVisibleColumns] = useState(
+    initialColumns.reduce((acc, col) => {
+      acc[col.field] = true;
+      return acc;
+    }, {})
+  );
+
+  const filteredColumns = useMemo(() => {
+    return initialColumns.filter((col) => visibleColumns[col.field] !== false);
+  }, [initialColumns, visibleColumns]);
+
+  if (isLoading) return <Typography>Loading contracts...</Typography>;
   if (error) return <Typography>Error loading contracts!</Typography>;
 
-  const contractsArray = Object.values(contractsData);
+  const contractsArray = contractsData ? Object.values(contractsData) : [];
+
+  const hexmapClassName = `hexmap-bg ${
+    theme.palette.mode === "dark" ? "hexmap-dark" : "hexmap-light"
+  }`;
+
+  const backgroundImageUrl =
+    theme.palette.mode === "dark" ? HexMap : HexMapLight;
 
   return (
-    <Box m="20px">
-      <Typography variant="h3" mb={2}>
+    <Box
+      className={hexmapClassName}
+      sx={{
+        backgroundImage: `url(${backgroundImageUrl})`,
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center 30%",
+        width: "100%",
+        height: "100%",
+        position: "relative",
+        zIndex: 0,
+        mt: "40px",
+      }}
+    >
+      <Typography variant="h2" mb={2} sx={{ fontWeight: 600, ml: 4 }}>
         All Contracts
       </Typography>
-      <AllContractsTable contracts={contractsArray} />
+      <Box>
+        <ScrollableStatsCardSection />
+      </Box>
+      <Box sx={{ mx: "auto", ml: 3 }}>
+        <ContractsFilterButtonGroup
+          filterType={filterType}
+          setFilterType={setFilterType}
+        />
+      </Box>
+      <Box sx={{ mx: "auto", pb: 4 }}>
+        <Box display="flex" justifyContent="flex-end" mb={2} mr={2}>
+          <ColumnVisibilityToggle
+            columns={initialColumns}
+            visibleColumns={visibleColumns}
+            onVisibilityChange={setVisibleColumns}
+          />
+        </Box>
+
+        <AllContractsTable
+          contracts={contractsArray}
+          columns={filteredColumns}
+        />
+      </Box>
     </Box>
   );
 };

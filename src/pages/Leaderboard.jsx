@@ -31,7 +31,7 @@ const Leaderboard = () => {
         zIndex: 0,
       }}
     >
-      <Box m="40px">
+      <Box m="40px" pb={4}>
         <Box
           display="flex"
           justifyContent="space-between"

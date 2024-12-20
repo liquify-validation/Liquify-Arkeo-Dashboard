@@ -59,7 +59,6 @@ const Provider = () => {
           </Box>
         </Box>
         <Table />
-        {/* Pagination */}
       </Box>
     </Box>
   );

@@ -1,19 +1,17 @@
-import { useState } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import { Box, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import WorkspacesOutlinedIcon from "@mui/icons-material/WorkspacesOutlined";
 import ArticleIcon from "@mui/icons-material/Article";
 import { ArkeoLogo, ArkeoIcon, AllProvidersIcon } from "../assets";
 
-const Item = ({ title, to, icon, selected, setSelected }) => {
+const Item = ({ title, to, icon, currentPath }) => {
   return (
     <MenuItem
-      active={selected === title}
+      active={currentPath === to}
       style={{ color: "white" }}
-      onClick={() => setSelected(title)}
       icon={icon}
     >
       <Typography>{title}</Typography>
@@ -23,7 +21,8 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
 };
 
 const Sidebar = ({ isSidebar }) => {
-  const [selected, setSelected] = useState("Dashboard");
+  const location = useLocation();
+  const currentPath = location.pathname;
 
   return (
     <Box
@@ -116,8 +115,7 @@ const Sidebar = ({ isSidebar }) => {
               title="Dashboard"
               to="/"
               icon={<DashboardIcon style={{ width: "30px", height: "30px" }} />}
-              selected={selected}
-              setSelected={setSelected}
+              currentPath={currentPath}
             />
 
             <Item
@@ -128,8 +126,7 @@ const Sidebar = ({ isSidebar }) => {
                   style={{ width: "30px", height: "30px" }}
                 />
               }
-              selected={selected}
-              setSelected={setSelected}
+              currentPath={currentPath}
             />
 
             <Item
@@ -142,16 +139,14 @@ const Sidebar = ({ isSidebar }) => {
                   style={{ width: "30px", height: "30px" }}
                 />
               }
-              selected={selected}
-              setSelected={setSelected}
+              currentPath={currentPath}
             />
 
             <Item
               title="Docs"
               to="/docs"
               icon={<ArticleIcon style={{ width: "30px", height: "30px" }} />}
-              selected={selected}
-              setSelected={setSelected}
+              currentPath={currentPath}
             />
           </Box>
         </Menu>

@@ -3,6 +3,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../theme";
 import { leaderboardData } from "../data/mockData";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
+import { use24hrCalls } from "../hooks/use24hrCalls";
+import { useProviders } from "../hooks/useProviders";
 
 const LeaderboardTable = () => {
   const theme = useTheme();
@@ -31,7 +33,6 @@ const LeaderboardTable = () => {
       <Box
         m="40px 0 0 0"
         height="100%"
-        // className="gradient-table-mask"
         sx={{
           "& .MuiDataGrid-main": {},
           "& .MuiDataGrid-root": { border: "none" },
@@ -64,7 +65,7 @@ const LeaderboardTable = () => {
             marginBottom: 2,
           }}
         >
-          <LeaderboardIcon /> {/* Leaderboard icon */}
+          <LeaderboardIcon />
           <Typography variant="h6" component="h2">
             Leaderboard
           </Typography>

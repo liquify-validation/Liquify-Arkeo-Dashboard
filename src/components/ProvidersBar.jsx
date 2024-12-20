@@ -4,7 +4,14 @@ import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import CustomButton from "../components/CustomButton";
 import { Link } from "react-router-dom";
 
-const ProvidersBar = () => {
+const ProvidersBar = ({ onSearchChange }) => {
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    if (onSearchChange) {
+      onSearchChange(value);
+    }
+  };
+
   return (
     <Box
       display="flex"
@@ -30,10 +37,10 @@ const ProvidersBar = () => {
         variant="outlined"
         className="gradient-border-mask"
         label="Search providers"
+        onChange={handleInputChange}
         sx={{
           flexGrow: 1,
           maxWidth: "calc(100% - 250px)",
-          ml: 2,
           "& .MuiOutlinedInput-root": {
             "& fieldset": {
               borderColor: "transparent",

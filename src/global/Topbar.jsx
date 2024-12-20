@@ -24,10 +24,10 @@ const Topbar = () => {
         marginLeft="20px"
       >
         <Typography variant="h5" style={{ color: "white" }}>
-          Welcome to Arkeo
+          Welcome to Arkeo Dashboard
         </Typography>
         <Typography variant="h7" style={{ color: "white" }}>
-          Here is what is happening in your account today
+          You can find the latest network stats here
         </Typography>
       </Box>
 

@@ -1,181 +1,157 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   Box,
   Typography,
   LinearProgress,
   Stack,
   useTheme,
+  Tooltip,
+  Button,
 } from "@mui/material";
 import { tokens } from "../theme";
-import {
-  BitcoinIcon,
-  EthereumIcon,
-  CosmosIconDark,
-  CosmosIconLight,
-  ThorchainIcon,
-  OptimismIcon,
-  OsmosisIcon,
-  LiteCoinIcon,
-  PolygonIcon,
-  DogeCoinIcon,
-  BinanceIcon,
-  AvaxIcon,
-  BCHIcon,
-  ArkeoIcon,
-} from "../assets";
-import { useNumberOfServices } from "../hooks/useNumberOfServices";
+import { useProvidersAnalytics } from "../hooks/useProviderAnalytics";
 
-const ProgressBars = () => {
+const MAX_VISIBLE = 5;
+const MAX_NAME_LENGTH = 12;
+
+const ProgressBars = ({ offset }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const isDarkMode = theme.palette.mode === "dark";
   const [showAll, setShowAll] = useState(false);
 
-  const { data: numberOfServices, isLoading, error } = useNumberOfServices();
+  const { data, isLoading, error } = useProvidersAnalytics(offset);
 
   const processedData = useMemo(() => {
-    if (!numberOfServices || !Object.keys(numberOfServices).length) return [];
+    if (!data || !data.providers) return [];
 
-    const services = Object.values(numberOfServices);
-    const maxCount = Math.max(...services.map((s) => s.count));
-
-    const mappedServices = services.map((service) => ({
-      title: service.name
-        .split("-")
-        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(" "),
-      count: service.count,
-      maxCount,
-      percentage: Math.round((service.count / maxCount) * 100),
+    const providers = data.providers.map((p) => ({
+      ...p,
+      total_nonce: Number(p.total_nonce),
     }));
 
-    return mappedServices.sort((a, b) => b.percentage - a.percentage);
-  }, [numberOfServices]);
+    const totalNonceSum = providers.reduce((sum, p) => sum + p.total_nonce, 0);
+
+    if (totalNonceSum === 0) {
+      return providers.map((p) => ({
+        provider: p.provider,
+        count: p.total_nonce,
+        percentage: 0,
+      }));
+    }
+
+    const mapped = providers.map((p) => ({
+      provider: p.provider,
+      count: p.total_nonce,
+      percentage: Math.round((p.total_nonce / totalNonceSum) * 100),
+    }));
+
+    return mapped.sort((a, b) => b.percentage - a.percentage);
+  }, [data]);
 
   if (isLoading) {
-    return <Typography>Loading services...</Typography>;
+    return <Typography>Loading provider analytics...</Typography>;
   }
 
   if (error) {
-    return <Typography>Error loading services</Typography>;
+    return <Typography>Error loading provider analytics</Typography>;
   }
 
-  const iconMapping = {
-    "arkeo-mainnet-fullnode": ArkeoIcon,
-    "avax-mainnet-fullnode": AvaxIcon,
-    "bch-mainnet-fullnode": BCHIcon,
-    "bnb-mainnet-fullnode": BinanceIcon,
-    "bsc-mainnet-fullnode": BinanceIcon,
-    "btc-mainnet-fullnode": BitcoinIcon,
-    "gaia-mainnet-rpc": isDarkMode ? CosmosIconDark : CosmosIconLight,
-    "doge-mainnet-fullnode": DogeCoinIcon,
-    "eth-mainnet-archivenode": EthereumIcon,
-    "eth-mainnet-fullnode": EthereumIcon,
-    "ltc-mainnet-fullnode": LiteCoinIcon,
-    "optimism-mainnet-fullnode": OptimismIcon,
-    "osmosis-mainnet-fullnode": OsmosisIcon,
-    "polygon-mainnet-fullnode": PolygonIcon,
-    "polygon-mainnet-archivenode": PolygonIcon,
-    "thorchain-mainnet-fullnode": ThorchainIcon,
-    "btc-mainnet-unchained": BitcoinIcon,
-    "eth-mainnet-unchained": EthereumIcon,
-    "optimism-mainnet-unchained": OptimismIcon,
-    "gaia-mainnet-grpc": isDarkMode ? CosmosIconDark : CosmosIconLight,
-  };
+  const displayedData = showAll
+    ? processedData
+    : processedData.slice(0, MAX_VISIBLE);
 
-  const getIconSrc = (name) => {
-    let iconName = name.toLowerCase().replace(/ /g, "-");
-
-    if (iconName === "gaia") {
-      return isDarkMode ? CosmosIconDark : CosmosIconLight;
+  const getDisplayName = (name) => {
+    if (name.length > MAX_NAME_LENGTH) {
+      return name.substring(0, MAX_NAME_LENGTH) + "...";
     }
-    return iconMapping[iconName];
+    return name;
   };
-
-  const displayedData = showAll ? processedData : processedData.slice(0, 5);
-
-  const toggleShowAll = () => setShowAll(!showAll);
 
   return (
     <Box width="100%" sx={{ zIndex: 1000 }}>
-      {displayedData.map((item, index) => (
-        <Stack
-          key={index}
-          direction="row"
-          alignItems="center"
-          spacing={1}
-          sx={{ mb: 2, width: "100%" }}
-        >
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              width: "fit-content",
-              minWidth: "275px",
-              padding: "1px",
-            }}
+      {displayedData.map((item, index) => {
+        const truncatedName = getDisplayName(item.provider);
+        return (
+          <Stack
+            key={index}
+            direction="row"
+            alignItems="center"
+            spacing={1}
+            sx={{ mb: 2, width: "100%" }}
           >
-            <img
-              src={getIconSrc(item.title)}
-              alt={`${item.title} Icon`}
-              style={{ width: 30, height: 30 }}
-            />
-            <Typography
-              fontSize="14px"
-              fontWeight="600"
-              color={colors.text[100]}
-              sx={{ ml: 1 }}
-            >
-              {item.title}
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              flexGrow: 1,
-              display: "flex",
-              alignItems: "center",
-              border: "2px solid white",
-              borderRadius: 10,
-            }}
-          >
-            <LinearProgress
-              variant="determinate"
-              value={item.percentage}
+            <Box
               sx={{
-                width: "100%",
-                height: 15,
-                borderRadius: 25,
-                backgroundColor: "#D9D9D9",
-                "& .MuiLinearProgress-bar": {
-                  backgroundColor: "#176BF8",
-                  borderRadius: 10,
-                },
+                display: "flex",
+                alignItems: "center",
+                width: "fit-content",
+                minWidth: "150px",
+                padding: "1px",
               }}
-            />
-          </Box>
-          <Typography
-            fontSize="16px"
-            fontWeight="700"
-            color={colors.text[100]}
-            sx={{ minWidth: "50px", textAlign: "right" }}
+            >
+              <Tooltip title={item.provider}>
+                <Typography
+                  fontSize="14px"
+                  fontWeight="600"
+                  color={colors.text[100]}
+                  sx={{ ml: 1, cursor: "default" }}
+                >
+                  {truncatedName}
+                </Typography>
+              </Tooltip>
+            </Box>
+            <Box
+              sx={{
+                flexGrow: 1,
+                display: "flex",
+                alignItems: "center",
+                border: "2px solid white",
+                borderRadius: 10,
+              }}
+            >
+              <LinearProgress
+                variant="determinate"
+                value={item.percentage}
+                sx={{
+                  width: "100%",
+                  height: 15,
+                  borderRadius: 25,
+                  backgroundColor: "#D9D9D9",
+                  "& .MuiLinearProgress-bar": {
+                    backgroundColor: "#176BF8",
+                    borderRadius: 10,
+                  },
+                }}
+              />
+            </Box>
+            <Typography
+              fontSize="16px"
+              fontWeight="700"
+              color={colors.text[100]}
+              sx={{ minWidth: "50px", textAlign: "right" }}
+            >
+              {`${item.count}`}
+            </Typography>
+          </Stack>
+        );
+      })}
+
+      {processedData.length > MAX_VISIBLE && (
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Button
+            variant="outlined"
+            onClick={() => setShowAll(!showAll)}
+            sx={{
+              color: showAll ? "#000" : "#000",
+              borderColor: "#bababa",
+              "&:hover": {
+                borderColor: "#176BF8",
+                color: "#176BF8",
+              },
+            }}
           >
-            {`${item.count}`}
-          </Typography>
-        </Stack>
-      ))}
-      {processedData.length > 5 && (
-        <Typography
-          onClick={toggleShowAll}
-          sx={{
-            cursor: "pointer",
-            color: theme.palette.primary.main,
-            mt: 2,
-            textAlign: "center",
-            textDecoration: "underline",
-          }}
-        >
-          {showAll ? "View Less" : "View All"}
-        </Typography>
+            {showAll ? "View Less" : "View All"}
+          </Button>
+        </Box>
       )}
     </Box>
   );

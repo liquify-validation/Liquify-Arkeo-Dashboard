@@ -6,22 +6,26 @@ const StatBox = ({ title, number, icon }) => {
   const colors = tokens(theme.palette.mode);
 
   return (
-    <Box width="100%" padding="40px" height="100%">
-      <Box display="flex" alignItems="center">
-        {icon}
-        <Box ml={3} mt={0.5}>
-          <Typography
-            variant="h4"
-            fontWeight="bold"
-            sx={{ color: colors.text[100], display: "block" }}
-          >
-            {title}
-          </Typography>
-
-          <Typography mt={0.5} variant="h4" sx={{ color: colors.text[200] }}>
-            {number}
-          </Typography>
-        </Box>
+    <Box
+      width="100%"
+      padding="40px"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      sx={{ lineHeight: 1 }}
+    >
+      {icon}
+      <Box ml={3}>
+        <Typography
+          variant="h4"
+          fontWeight="bold"
+          sx={{ color: colors.text[100] }}
+        >
+          {title}
+        </Typography>
+        <Typography mt={0.5} variant="h4" sx={{ color: colors.text[200] }}>
+          {number}
+        </Typography>
       </Box>
     </Box>
   );

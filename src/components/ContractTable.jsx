@@ -1,45 +1,94 @@
+import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../theme";
+import ServiceCell from "./ServiceCell";
 
-const ContractTable = ({ contracts, isp, location }) => {
+import { useCurrentHeight } from "../hooks/useCurrentHeight";
+import { useSecondsPerBlock } from "../hooks/useSecondsPerBlock";
+import { secondsToTimeObject } from "../utils/commonFunctions";
+
+const ContractTable = ({ contracts, isp, location, columns }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const rows = contracts.map((contract) => {
+  const { data: currentHeight, isLoading: heightLoading } = useCurrentHeight();
+  const { data: secondsPerBlock, isLoading: spbLoading } = useSecondsPerBlock();
+
+  const rows = (contracts || []).map((contract) => {
     const rateObj = contract.rate
       ? JSON.parse(contract.rate.replace(/'/g, '"'))
       : { denom: "", amount: "" };
+
     const status = contract.completed === null ? "In Progress" : "Completed";
-    const timeRemaining = "";
+    const serviceNumber = contract.service;
+    const type = contract.type || "-";
+
+    const providerFull = contract.provider || "";
+    const providerName = providerFull
+      ? providerFull.substring(0, 12) + "..."
+      : "-";
+
+    const queries = contract.queries_per_minute
+      ? contract.queries_per_minute
+      : "-";
+
+    let timeRemaining = "-";
+    if (
+      !heightLoading &&
+      !spbLoading &&
+      currentHeight &&
+      secondsPerBlock &&
+      contract.settlement_height
+    ) {
+      const blocksRemaining = contract.settlement_height - currentHeight;
+      if (blocksRemaining > 0) {
+        const secondsUntilSettlement =
+          blocksRemaining * parseFloat(secondsPerBlock);
+        const timeObj = secondsToTimeObject(secondsUntilSettlement);
+        timeRemaining = `${timeObj.hours}h ${timeObj.minutes}m ${timeObj.seconds}s`;
+      } else {
+        timeRemaining = "Expired";
+      }
+    }
 
     return {
       id: contract.id,
+      serviceNumber: serviceNumber,
       duration: contract.duration,
       isp: isp,
       location: location,
       contractCost: `${rateObj.amount} ${rateObj.denom}`,
       callsSubmitted: contract.nonce,
       timeRemaining: timeRemaining,
+      queries: queries,
+      type: type,
       status: status,
+      providerName: providerName,
+      providerFull: providerFull,
     };
   });
 
-  const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "duration", headerName: "Duration", flex: 1 },
-    { field: "isp", headerName: "ISP", flex: 1 },
-    { field: "location", headerName: "Location", flex: 1 },
-    { field: "contractCost", headerName: "Contract Cost", flex: 1 },
-    { field: "callsSubmitted", headerName: "# of Calls Submitted", flex: 1 },
-    { field: "timeRemaining", headerName: "Time Remaining", flex: 1 },
-    { field: "status", headerName: "Status", flex: 1 },
-  ];
+  const enhancedColumns = columns.map((col) => {
+    if (col.field === "serviceNumber") {
+      return {
+        ...col,
+        renderCell: (params) => {
+          const serviceNumber = params.value;
+          return <ServiceCell serviceNumber={serviceNumber} />;
+        },
+      };
+    }
+    return col;
+  });
 
   return (
     <Box
       sx={{
-        height: 400,
+        flex: 1,
+        maxWidth: "98%",
+        mx: "auto",
+        overflow: "auto",
         "& .MuiDataGrid-root": { border: "none" },
         "& .MuiDataGrid-columnHeaders": {
           backgroundColor: colors.primary[700],
@@ -64,7 +113,11 @@ const ContractTable = ({ contracts, isp, location }) => {
       {rows.length === 0 ? (
         <Typography>No contracts found</Typography>
       ) : (
-        <DataGrid rows={rows} columns={columns} getRowId={(row) => row.id} />
+        <DataGrid
+          rows={rows}
+          columns={enhancedColumns}
+          getRowId={(row) => row.id}
+        />
       )}
     </Box>
   );

@@ -14,10 +14,19 @@ import {
 import { tokens } from "../theme";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import { useNavigate } from "react-router-dom";
+import ShowChartIcon from "@mui/icons-material/ShowChart";
+import { useProviderPerformance } from "../hooks/useProviderPerformance";
+import ProviderPerformanceChart from "./ProviderPerformanceChart";
 
-// TO DO - Make text so can be copied
+import { useNavigate } from "react-router-dom";
+import { useServiceName } from "../hooks/useServiceName";
+// import { getServiceIcon } from "../utils/commonFunctions";
+
 // TO DO - Swap out any mock data and logic for open and online
+// TO DO - Move services tooltip to own component
+// TO DO - FIX Sevices showing on hover
+// TO DO - Add function that maps service number to service and adds icon
+// TO DO - Look at OFFLINE/Online logic
 
 const isValidHttpUrl = (string) => {
   let url;
@@ -48,12 +57,15 @@ const ProviderCard = ({
   freeUsageLimit,
   status,
   providerData,
+  numberOfServices,
+  completedContracts,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [openDialog, setOpenDialog] = useState(false);
   const [endpointsOpen, setEndpointsOpen] = useState(false);
   const navigate = useNavigate();
+  const [performanceDialogOpen, setPerformanceDialogOpen] = useState(false);
 
   const parsedEndpoints = providerData?.endpoints
     ? JSON.parse(providerData.endpoints)
@@ -73,6 +85,14 @@ const ProviderCard = ({
   };
   const handleDialogClose = () => {
     setOpenDialog(false);
+  };
+
+  const handlePerformanceDialogOpen = () => {
+    setPerformanceDialogOpen(true);
+  };
+
+  const handlePerformanceDialogClose = () => {
+    setPerformanceDialogOpen(false);
   };
 
   const displayedEndpoint =
@@ -101,12 +121,37 @@ const ProviderCard = ({
     );
   };
 
+  const serviceNumber = providerData?.services;
+  const {
+    data: serviceName,
+    isLoading: serviceLoading,
+    error: serviceError,
+  } = useServiceName(serviceNumber);
+
+  const {
+    data: performanceData,
+    isLoading: performanceLoading,
+    error: performanceError,
+  } = useProviderPerformance(performanceDialogOpen ? providerId : null);
+
+  const servicesTooltipContent = () => {
+    if (serviceLoading) return "Loading...";
+    if (serviceError) return "Error loading service name";
+    if (!serviceName) return "No service name found";
+
+    return (
+      <Box display="flex" alignItems="center" gap={1}>
+        <Typography variant="body2">{serviceName}</Typography>
+      </Box>
+    );
+  };
+
   return (
     <Box
       width="100%"
       padding="25px"
       height="auto"
-      minHeight="525px"
+      minHeight="600px"
       className="gradient-border-mask"
       sx={{ userSelect: "text" }}
     >
@@ -146,9 +191,100 @@ const ProviderCard = ({
         flexDirection="row"
         justifyContent="space-between"
       >
+        <Typography variant="p">Completed Contracts:</Typography>
+        <Typography variant="p">{completedContracts}</Typography>
+      </Box>
+      <Box
+        mt={1.5}
+        width="100%"
+        display="flex"
+        flexDirection="row"
+        justifyContent="space-between"
+      >
+        <Typography variant="p">Number of Services:</Typography>
+        {numberOfServices > 0 ? (
+          <Tooltip title={servicesTooltipContent()} arrow>
+            <Typography variant="p" sx={{ cursor: "pointer" }}>
+              {numberOfServices}
+            </Typography>
+          </Tooltip>
+        ) : (
+          <Typography variant="p">{numberOfServices}</Typography>
+        )}
+      </Box>
+      <Box
+        mt={1.5}
+        width="100%"
+        display="flex"
+        flexDirection="row"
+        justifyContent="space-between"
+      >
         <Typography variant="p">Age(blocks):</Typography>
         <Typography variant="p">{age}</Typography>
       </Box>
+
+      <Box
+        mt={1.5}
+        width="100%"
+        display="flex"
+        flexDirection="row"
+        justifyContent="space-between"
+      >
+        <Typography variant="p">Performance:</Typography>
+        <IconButton
+          onClick={(event) => {
+            event.stopPropagation();
+            handlePerformanceDialogOpen();
+          }}
+          size="small"
+          sx={{ padding: 0 }}
+        >
+          <ShowChartIcon />
+        </IconButton>
+      </Box>
+
+      {/* Performance Dialog */}
+      <Dialog
+        open={performanceDialogOpen}
+        onClose={handlePerformanceDialogClose}
+        fullWidth={true}
+        maxWidth="md"
+      >
+        <Box
+          className="gradient-border-mask"
+          backgroundColor={colors.primary[200]}
+          width="100%"
+          sx={{ pt: 2, pb: 4 }}
+        >
+          <DialogTitle
+            sx={{
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              color: "white",
+              ml: 2,
+            }}
+          >
+            Provider Performance
+          </DialogTitle>
+          <DialogContent>
+            {performanceLoading ? (
+              <Typography>Loading chart...</Typography>
+            ) : performanceError ? (
+              <Typography color="red">
+                Error loading performance data
+              </Typography>
+            ) : performanceData ? (
+              <ProviderPerformanceChart data={performanceData} />
+            ) : (
+              <Typography>No data available</Typography>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handlePerformanceDialogClose}>Close</Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
+
       <Box
         mt={1.5}
         width="100%"
@@ -294,7 +430,7 @@ const ProviderCard = ({
       <Box
         sx={{
           position: "absolute",
-          bottom: "20px",
+          bottom: "15px",
           left: "25px",
           right: "25px",
           display: "flex",
@@ -316,7 +452,7 @@ const ProviderCard = ({
         <Tooltip title={statusTooltip}>
           <Box
             p="8px"
-            marginLeft="20px"
+            marginLeft="10px"
             mt="20px"
             px="20px"
             display="inline-block"

@@ -1,5 +1,5 @@
 import Pie from "./Pie";
-import Pie2 from "./Pie2";
+import Doughnut from "./Doughnut";
 import ProviderCard from "./ProviderCard";
 import Table from "./Table";
 import Header from "./Header";
@@ -15,10 +15,16 @@ import LeaderboardTable from "./LeaderboardTable";
 import CircleIcon from "./CircleIcon";
 import ContractTable from "./ContractTable";
 import AllContractsTable from "./AllContractsTable";
+import ServiceCell from "./ServiceCell";
+import OffsetButtonGroup from "./OffsetButtonGroup";
+import ColumnVisibilityToggle from "./ColumnVisibilityToggle";
+import PieChart from "./PieChart";
+import ContractsFilterButtonGroup from "./ContractsFilterButtonGroup";
+import ScrollableStatsCardSection from "./ScrollableStatsCardSection";
 
 export {
   Pie,
-  Pie2,
+  Doughnut,
   ProviderCard,
   Table,
   Header,
@@ -34,4 +40,10 @@ export {
   CircleIcon,
   ContractTable,
   AllContractsTable,
+  ServiceCell,
+  OffsetButtonGroup,
+  ColumnVisibilityToggle,
+  PieChart,
+  ContractsFilterButtonGroup,
+  ScrollableStatsCardSection,
 };

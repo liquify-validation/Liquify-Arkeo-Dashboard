@@ -1,32 +1,28 @@
-import { Box, Typography, useTheme, Tooltip, IconButton } from "@mui/material";
+import React from "react";
+import {
+  Box,
+  Typography,
+  useTheme,
+  Tooltip,
+  IconButton,
+  Link,
+} from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../theme";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import ServiceCell from "./ServiceCell";
 
-const AllContractsTable = ({ contracts }) => {
+import { secondsToTimeObject } from "../utils/commonFunctions";
+
+import { useCurrentHeight } from "../hooks/useCurrentHeight";
+import { useSecondsPerBlock } from "../hooks/useSecondsPerBlock";
+
+const AllContractsTable = ({ contracts, getProviderNameFunction, columns }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  const rows = contracts.map((contract) => {
-    const rateObj = contract.rate
-      ? JSON.parse(contract.rate.replace(/'/g, '"'))
-      : { denom: "", amount: "" };
-    const status = contract.completed === null ? "In Progress" : "Completed";
-    const timeRemaining = "";
-    const providerFull = contract.provider;
-    const providerShort = providerFull.slice(-4);
-
-    return {
-      id: contract.id,
-      providerFull: providerFull,
-      providerShort: providerShort,
-      duration: contract.duration,
-      contractCost: `${rateObj.amount} ${rateObj.denom}`,
-      callsSubmitted: contract.nonce,
-      timeRemaining: timeRemaining,
-      status: status,
-    };
-  });
+  const { data: currentHeight, isLoading: heightLoading } = useCurrentHeight();
+  const { data: secondsPerBlock, isLoading: spbLoading } = useSecondsPerBlock();
 
   const copyToClipboard = (value) => {
     navigator.clipboard.writeText(value).catch((err) => {
@@ -34,46 +30,123 @@ const AllContractsTable = ({ contracts }) => {
     });
   };
 
-  const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    {
-      field: "providerShort",
-      headerName: "Provider",
-      flex: 1,
-      renderCell: (params) => {
-        const fullProvider = params.row.providerFull;
-        const shortProvider = params.value;
-        return (
-          <Box display="flex" alignItems="center" gap={1}>
-            <Typography sx={{ userSelect: "text", cursor: "pointer" }}>
-              {shortProvider}
-            </Typography>
-            <Tooltip title="Copy full provider">
-              <IconButton
-                size="small"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  copyToClipboard(fullProvider);
-                }}
-              >
-                <ContentCopyIcon fontSize="inherit" />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        );
-      },
-    },
-    { field: "duration", headerName: "Duration", flex: 1 },
-    { field: "contractCost", headerName: "Contract Cost", flex: 1 },
-    { field: "callsSubmitted", headerName: "# of Calls Submitted", flex: 1 },
-    { field: "timeRemaining", headerName: "Time Remaining", flex: 1 },
-    { field: "status", headerName: "Status", flex: 1 },
-  ];
+  const rows = (contracts || []).map((contract) => {
+    const rateObj = contract.rate
+      ? JSON.parse(contract.rate.replace(/'/g, '"'))
+      : { denom: "", amount: "" };
+
+    const status = contract.completed === null ? "In Progress" : "Completed";
+
+    const providerFull = contract.provider;
+    const providerShort = providerFull.slice(-4);
+
+    let timeRemaining = "-";
+    if (
+      !heightLoading &&
+      !spbLoading &&
+      currentHeight &&
+      secondsPerBlock &&
+      contract.settlement_height
+    ) {
+      const blocksRemaining = contract.settlement_height - currentHeight;
+      if (blocksRemaining > 0) {
+        const secondsUntilSettlement =
+          blocksRemaining * parseFloat(secondsPerBlock);
+        const timeObj = secondsToTimeObject(secondsUntilSettlement);
+        timeRemaining = `${timeObj.hours}h ${timeObj.minutes}m ${timeObj.seconds}s`;
+      } else {
+        timeRemaining = "Expired";
+      }
+    }
+
+    const queries = contract.queries_per_minute
+      ? contract.queries_per_minute
+      : "-";
+    const providerName = getProviderNameFunction
+      ? getProviderNameFunction(providerFull)
+      : providerFull.substring(0, 12) + "...";
+
+    return {
+      id: contract.id,
+      serviceNumber: contract.service,
+      providerFull: providerFull,
+      providerShort: providerShort,
+      providerName: providerName,
+      duration: contract.duration,
+      contractCost: `${rateObj.amount} ${rateObj.denom}`,
+      callsSubmitted: contract.nonce,
+      timeRemaining: timeRemaining,
+      queries: queries,
+      type: contract.type,
+      status: status,
+    };
+  });
+
+  const enhancedColumns = columns.map((col) => {
+    if (col.field === "serviceNumber") {
+      return {
+        ...col,
+        renderCell: (params) => {
+          const serviceNumber = params.value;
+          return <ServiceCell serviceNumber={serviceNumber} />;
+        },
+      };
+    } else if (col.field === "providerShort") {
+      return {
+        ...col,
+        renderCell: (params) => {
+          const fullProvider = params.row.providerFull;
+          const shortProvider = params.value;
+          return (
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography sx={{ userSelect: "text", cursor: "pointer" }}>
+                {shortProvider}
+              </Typography>
+              <Tooltip title="Copy full provider">
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    copyToClipboard(fullProvider);
+                  }}
+                >
+                  <ContentCopyIcon fontSize="inherit" />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          );
+        },
+      };
+    } else if (col.field === "providerName") {
+      return {
+        ...col,
+        renderCell: (params) => {
+          const providerId = params.row.providerFull;
+          const providerName = params.value;
+          const providerUrl = `http://localhost:5173/contracts/${providerId}?location=UNKNOWN&isp=RTCOMM&providerName=${encodeURIComponent(
+            providerName
+          )}`;
+          return (
+            <Link
+              href={providerUrl}
+              style={{ textDecoration: "none", color: "#1d8aed" }}
+            >
+              {providerName}
+            </Link>
+          );
+        },
+      };
+    }
+    return col;
+  });
 
   return (
     <Box
       sx={{
-        height: 400,
+        flex: 1,
+        maxWidth: "98%",
+        mx: "auto",
+        overflow: "auto",
         "& .MuiDataGrid-root": { border: "none" },
         "& .MuiDataGrid-columnHeaders": {
           backgroundColor: colors.primary[700],
@@ -98,7 +171,11 @@ const AllContractsTable = ({ contracts }) => {
       {rows.length === 0 ? (
         <Typography>No contracts found</Typography>
       ) : (
-        <DataGrid rows={rows} columns={columns} getRowId={(row) => row.id} />
+        <DataGrid
+          rows={rows}
+          columns={enhancedColumns}
+          getRowId={(row) => row.id}
+        />
       )}
     </Box>
   );

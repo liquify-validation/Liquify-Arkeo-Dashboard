@@ -27,6 +27,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
+// TO DO - Add Loading Spinner Throughout
+// TO DO - Add Mui error notifications
+
 function App() {
   const [theme, colorMode] = useMode();
 

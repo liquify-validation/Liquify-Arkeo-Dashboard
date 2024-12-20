@@ -96,7 +96,6 @@ const Table = () => {
       <Box
         m="40px 0 0 0"
         height="100%"
-        // className="gradient-table-mask"
         sx={{
           "& .MuiDataGrid-main": {},
           "& .MuiDataGrid-root": { border: "none" },

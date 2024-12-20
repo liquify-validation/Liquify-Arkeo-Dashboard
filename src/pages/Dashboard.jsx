@@ -1,8 +1,14 @@
+import { useMemo, useState } from "react";
 import Header from "../components/Header";
 import { Box, Typography, useTheme } from "@mui/material";
 import { tokens } from "../theme";
 import { useTotalProviders } from "../hooks/useTotalProviders";
+import { useTotalServices } from "../hooks/useTotalServices";
 import { useTotalBondedValue } from "../hooks/useTotalBondedValue";
+import { useProviderLocations } from "../hooks/useProviderLocations";
+import { useChainList } from "../hooks/useChainList";
+import { useChainAnalytics } from "../hooks/useChainAnalytics";
+import { useAllContracts } from "../hooks/useAllContracts";
 
 import {
   TimeIcon,
@@ -12,11 +18,21 @@ import {
   HexMapLight,
 } from "../assets";
 
-import { Pie2, StatBox, ProgressBars } from "../components";
+import {
+  Doughnut,
+  StatBox,
+  ProgressBars,
+  ContractsFilterButtonGroup,
+  OffsetButtonGroup,
+  PieChart,
+} from "../components";
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+
+  const [offsetProviders, setOffsetProviders] = useState("24");
+  const [offsetRequests, setOffsetRequests] = useState("24");
 
   const {
     data: totalProviders,
@@ -25,12 +41,84 @@ const Dashboard = () => {
   } = useTotalProviders();
 
   const {
+    data: totalServices,
+    isLoading: loadingServices,
+    error: errorServices,
+  } = useTotalServices();
+
+  const {
     data: totalBondedValue,
     isLoading: loadingBonded,
     error: errorBonded,
   } = useTotalBondedValue();
 
-  const numberOfServices = "12";
+  const {
+    data: providerLocationsData,
+    isLoading: locationsLoading,
+    error: locationsError,
+  } = useProviderLocations();
+
+  const {
+    data: chainListData,
+    isLoading: chainListLoading,
+    error: chainListError,
+  } = useChainList();
+
+  const {
+    data: chainAnalyticsData,
+    isLoading: chainAnalyticsLoading,
+    error: chainAnalyticsError,
+  } = useChainAnalytics(offsetRequests, chainListData);
+
+  const {
+    data: allContractsData,
+    isLoading: allContractsLoading,
+    error: allContractsError,
+  } = useAllContracts();
+
+  const [filterType, setFilterType] = useState("ALL");
+
+  const filteredContracts = useMemo(() => {
+    if (!allContractsData) return [];
+    const contractsArray = Object.values(allContractsData);
+    if (filterType === "ALL") {
+      return contractsArray;
+    } else if (filterType === "ACTIVE") {
+      return contractsArray.filter((c) => c.completed === false);
+    } else {
+      return contractsArray.filter((c) => c.completed === true);
+    }
+  }, [allContractsData, filterType]);
+
+  const contractDistributionData = useMemo(() => {
+    const providerMap = {};
+    filteredContracts.forEach((contract) => {
+      const provider = contract.provider;
+      if (!providerMap[provider]) {
+        providerMap[provider] = 0;
+      }
+      providerMap[provider]++;
+    });
+
+    const colorPalette = [
+      "#176BF8",
+      "#46ECBC",
+      "#1e5be0",
+      "#FF8C00",
+      "#FF69B4",
+      "#ADFF2F",
+    ];
+    let colorIndex = 0;
+    return Object.entries(providerMap).map(([provider, count]) => {
+      const color = colorPalette[colorIndex % colorPalette.length];
+      colorIndex++;
+      return {
+        id: provider,
+        value: count,
+        color: color,
+      };
+    });
+  }, [filteredContracts]);
 
   const hexmapClassName = `hexmap-bg ${
     theme.palette.mode === "dark" ? "hexmap-dark" : "hexmap-light"
@@ -47,7 +135,6 @@ const Dashboard = () => {
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center 70%",
         width: "100%",
-        height: "100%",
         position: "relative",
         zIndex: 0,
       }}
@@ -57,75 +144,89 @@ const Dashboard = () => {
           <Header title="Dashboard" />
         </Box>
 
+        {/* Top Stat Boxes Row */}
         <Box
           display="grid"
           gridTemplateColumns="repeat(12, 1fr)"
-          gridAutoRows="140px"
           gap="2rem"
           mt={5}
+          alignItems="stretch"
         >
           <Box
             gridColumn="span 4"
-            display="flex"
-            alignItems="center"
-            justifyContent="left"
             className="gradient-border-mask"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              p: 2,
+            }}
           >
-            <Box>
-              <StatBox
-                number={
-                  loadingProviders
-                    ? "Loading..."
-                    : errorProviders
-                    ? "Error"
-                    : totalProviders
-                }
-                title="TOTAL PROVIDERS"
-                progress=""
-                increase="+12%"
-                icon={<img src={ProviderIcon} alt="Provider Icon" />}
-              />
-            </Box>
-          </Box>
-          <Box
-            gridColumn="span 4"
-            display="flex"
-            alignItems="center"
-            justifyContent="left"
-            className="gradient-border-mask"
-          >
-            <Box>
-              <StatBox
-                number={
-                  loadingBonded
-                    ? "Loading..."
-                    : errorBonded
-                    ? "Error"
-                    : totalBondedValue
-                }
-                title="TOTAL BONDED VALUE"
-                icon={<img src={BondedIcon} alt="Bonded Icon" />}
-              />
-            </Box>
+            <StatBox
+              number={
+                loadingProviders
+                  ? "Loading..."
+                  : errorProviders
+                  ? "Error"
+                  : totalProviders
+              }
+              title="TOTAL PROVIDERS"
+              progress=""
+              increase="+12%"
+              icon={<img src={ProviderIcon} alt="Provider Icon" />}
+            />
           </Box>
 
           <Box
             gridColumn="span 4"
-            display="flex"
-            alignItems="center"
-            justifyContent="left"
             className="gradient-border-mask"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              p: 2,
+            }}
           >
-            <Box>
-              <StatBox
-                number={numberOfServices}
-                title="NUMBER OF SERVICES"
-                icon={<img src={TimeIcon} alt="Time Icon" />}
-              />
-            </Box>
+            <StatBox
+              number={
+                loadingBonded
+                  ? "Loading..."
+                  : errorBonded
+                  ? "Error"
+                  : totalBondedValue
+              }
+              title="TOTAL BONDED VALUE"
+              icon={<img src={BondedIcon} alt="Bonded Icon" />}
+            />
           </Box>
-          {/*ROW 2*/}
+
+          <Box
+            gridColumn="span 4"
+            className="gradient-border-mask"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              flexDirection: "column",
+              p: 2,
+            }}
+          >
+            <StatBox
+              number={
+                loadingServices
+                  ? "Loading..."
+                  : errorServices
+                  ? "Error"
+                  : totalServices
+              }
+              title="NUMBER OF SERVICES"
+              icon={<img src={TimeIcon} alt="Time Icon" />}
+            />
+          </Box>
         </Box>
+
         <Box mt={8}>
           <Typography fontSize="20px" fontWeight="700" color={colors.text[100]}>
             Stats Overview
@@ -135,61 +236,208 @@ const Dashboard = () => {
             sx={{ borderBottom: "1px solid", my: 2 }}
           ></Box>
         </Box>
+
+        {/* Chart Sections */}
         <Box
           display="grid"
           gridTemplateColumns="repeat(12, 1fr)"
-          gridAutoRows="auto"
           gap="2rem"
           mt={5}
+          alignItems="stretch"
         >
+          {/* Distribution of Network Providers */}
           <Box
             gridColumn="span 6"
-            display="flex"
-            flexDirection="column"
             className="gradient-border-mask"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              p: 2,
+            }}
           >
-            <Box>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ flexShrink: 0, mb: 2 }}
+            >
               <Typography
                 fontSize="26px"
                 fontWeight="700"
                 color={colors.text[100]}
-                margin="30px"
               >
                 Distribution of Network Providers
               </Typography>
-              <Box
-                display="flex"
-                sx={{ ml: "30px", mr: "30px" }}
-                alignItems="center"
-                justifyContent="center"
-                marginLeft="30px"
-              >
-                <ProgressBars />
-              </Box>
+              <OffsetButtonGroup
+                offset={offsetProviders}
+                setOffset={setOffsetProviders}
+              />
+            </Box>
+            <Box
+              sx={{
+                flexGrow: 1,
+                p: 1,
+                display: "flex",
+                overflow: "auto",
+                mt: 6,
+              }}
+            >
+              <ProgressBars offset={offsetProviders} />
             </Box>
           </Box>
+
+          {/* Request Distribution by Network */}
           <Box
             gridColumn="span 6"
-            display="flex"
-            height="400px"
-            flexDirection="column"
             className="gradient-border-mask"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              p: 2,
+            }}
           >
-            <Typography
-              fontSize="26px"
-              fontWeight="700"
-              color={colors.text[100]}
-              margin="30px"
-            >
-              Request Distribution by Networks
-            </Typography>
             <Box
-              sx={{ maxWidth: "600px", height: "300px" }}
+              display="flex"
+              justifyContent="space-between"
               alignItems="center"
-              justifyContent="center"
-              margin="5px"
+              sx={{ flexShrink: 0, mb: 2 }}
             >
-              <Pie2 />
+              <Typography
+                fontSize="26px"
+                fontWeight="700"
+                color={colors.text[100]}
+              >
+                Request Distribution by Network
+              </Typography>
+              <OffsetButtonGroup
+                offset={offsetRequests}
+                setOffset={setOffsetRequests}
+              />
+            </Box>
+            <Box
+              sx={{
+                flexGrow: 1,
+                p: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "auto",
+              }}
+            >
+              {chainListLoading || chainAnalyticsLoading ? (
+                <Typography color={colors.text[100]}>Loading...</Typography>
+              ) : chainListError || chainAnalyticsError ? (
+                <Typography color="red">Error loading chain data</Typography>
+              ) : (
+                <Box sx={{ width: "100%", height: "300px" }}>
+                  <PieChart data={chainAnalyticsData || []} />
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Box>
+
+        <Box
+          display="grid"
+          gridTemplateColumns="repeat(12, 1fr)"
+          gap="2rem"
+          mt={4}
+          pb={4}
+          alignItems="stretch"
+        >
+          {/* Contract Distribution by Providers */}
+          <Box
+            gridColumn="span 6"
+            className="gradient-border-mask"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              p: 2,
+            }}
+          >
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ flexShrink: 0, mb: 2 }}
+            >
+              <Typography
+                fontSize="26px"
+                fontWeight="700"
+                color={colors.text[100]}
+              >
+                Contract Distribution by Providers
+              </Typography>
+              <ContractsFilterButtonGroup
+                filterType={filterType}
+                setFilterType={setFilterType}
+              />
+            </Box>
+            <Box
+              sx={{
+                flexGrow: 1,
+                p: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "auto",
+              }}
+            >
+              {allContractsLoading ? (
+                <Typography color={colors.text[100]}>Loading...</Typography>
+              ) : allContractsError ? (
+                <Typography color="red">Error loading contracts</Typography>
+              ) : (
+                <Box sx={{ width: "100%", height: "300px" }}>
+                  <PieChart data={contractDistributionData || []} />
+                </Box>
+              )}
+            </Box>
+          </Box>
+
+          {/* Location of Providers */}
+          <Box
+            gridColumn="span 6"
+            className="gradient-border-mask"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              p: 2,
+            }}
+          >
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ flexShrink: 0, mb: 2 }}
+            >
+              <Typography
+                fontSize="26px"
+                fontWeight="700"
+                color={colors.text[100]}
+              >
+                Location of Providers
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                flexGrow: 1,
+                p: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "auto",
+              }}
+            >
+              {locationsLoading ? (
+                <Typography color={colors.text[100]}>Loading...</Typography>
+              ) : locationsError ? (
+                <Typography color="red">Error loading locations</Typography>
+              ) : (
+                <Box sx={{ width: "100%", height: "300px" }}>
+                  <PieChart data={providerLocationsData || []} />
+                </Box>
+              )}
             </Box>
           </Box>
         </Box>
