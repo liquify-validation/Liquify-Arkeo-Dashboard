@@ -20,12 +20,9 @@ import ProviderPerformanceChart from "./ProviderPerformanceChart";
 
 import { useNavigate } from "react-router-dom";
 import { useServiceName } from "../hooks/useServiceName";
-// import { getServiceIcon } from "../utils/commonFunctions";
+import ServicesTooltip from "./ServiceTooltip";
 
 // TO DO - Swap out any mock data and logic for open and online
-// TO DO - Move services tooltip to own component
-// TO DO - FIX Sevices showing on hover
-// TO DO - Add function that maps service number to service and adds icon
 // TO DO - Look at OFFLINE/Online logic
 
 const isValidHttpUrl = (string) => {
@@ -59,8 +56,10 @@ const ProviderCard = ({
   providerData,
   numberOfServices,
   completedContracts,
+  services,
 }) => {
   const theme = useTheme();
+  const isDarkMode = theme.palette.mode === "dark";
   const colors = tokens(theme.palette.mode);
   const [openDialog, setOpenDialog] = useState(false);
   const [endpointsOpen, setEndpointsOpen] = useState(false);
@@ -127,6 +126,8 @@ const ProviderCard = ({
     isLoading: serviceLoading,
     error: serviceError,
   } = useServiceName(serviceNumber);
+
+  console.log("service name", serviceName);
 
   const {
     data: performanceData,
@@ -200,17 +201,15 @@ const ProviderCard = ({
         display="flex"
         flexDirection="row"
         justifyContent="space-between"
+        alignItems="center"
       >
         <Typography variant="p">Number of Services:</Typography>
-        {numberOfServices > 0 ? (
-          <Tooltip title={servicesTooltipContent()} arrow>
-            <Typography variant="p" sx={{ cursor: "pointer" }}>
-              {numberOfServices}
-            </Typography>
-          </Tooltip>
-        ) : (
+        <Box display="flex" alignItems="center">
           <Typography variant="p">{numberOfServices}</Typography>
-        )}
+          {numberOfServices > 0 && (
+            <ServicesTooltip services={serviceName} isDarkMode={isDarkMode} />
+          )}
+        </Box>
       </Box>
       <Box
         mt={1.5}

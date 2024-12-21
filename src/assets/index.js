@@ -27,6 +27,10 @@ import ThorchainIcon from "./thornode-icon.svg";
 import AllProvidersIcon from "./allproviders_icon.svg";
 import ReserveIcon from "./reserveicon.svg";
 import DefaultIcon from "./allproviders_icon.svg";
+import PolkadotIcon from "./polkadot_icon.svg";
+import SolIcon from "./sol_icon.svg";
+import CardanoIcon from "./cardano_icon.svg";
+import EthereumClassicIcon from "./etc_icon.svg";
 
 export {
   ArkeoLogo,
@@ -58,4 +62,8 @@ export {
   AllProvidersIcon,
   ReserveIcon,
   DefaultIcon,
+  PolkadotIcon,
+  SolIcon,
+  CardanoIcon,
+  EthereumClassicIcon,
 };

@@ -21,6 +21,7 @@ import ColumnVisibilityToggle from "./ColumnVisibilityToggle";
 import PieChart from "./PieChart";
 import ContractsFilterButtonGroup from "./ContractsFilterButtonGroup";
 import ScrollableStatsCardSection from "./ScrollableStatsCardSection";
+import ServiceTooltip from "./ServiceTooltip";
 
 export {
   Pie,
@@ -46,4 +47,5 @@ export {
   PieChart,
   ContractsFilterButtonGroup,
   ScrollableStatsCardSection,
+  ServiceTooltip,
 };
