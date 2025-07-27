@@ -8,14 +8,31 @@ import { useCurrentHeight } from "../hooks/useCurrentHeight";
 import { useSecondsPerBlock } from "../hooks/useSecondsPerBlock";
 import { secondsToTimeObject } from "../utils/commonFunctions";
 
-const ContractTable = ({ contracts, isp, location, columns }) => {
+const ContractTable = ({
+  contracts,
+  filterType = "ALL",
+  isp,
+  location,
+  columns,
+}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   const { data: currentHeight, isLoading: heightLoading } = useCurrentHeight();
   const { data: secondsPerBlock, isLoading: spbLoading } = useSecondsPerBlock();
 
-  const rows = (contracts || []).map((contract) => {
+  const visibleContracts = React.useMemo(() => {
+    switch (filterType) {
+      case "ACTIVE":
+        return contracts?.filter((c) => c.completed === null);
+      case "COMPLETED":
+        return contracts?.filter((c) => c.completed !== null);
+      default:
+        return contracts;
+    }
+  }, [contracts, filterType]);
+
+  const rows = (visibleContracts || []).map((contract) => {
     const rateObj = contract.rate
       ? JSON.parse(contract.rate.replace(/'/g, '"'))
       : { denom: "", amount: "" };
@@ -23,11 +40,15 @@ const ContractTable = ({ contracts, isp, location, columns }) => {
     const status = contract.completed === null ? "In Progress" : "Completed";
     const serviceNumber = contract.service;
     const type = contract.type || "-";
+    const settlementHeight = contract.settlement_height ?? "-";
 
-    const providerFull = contract.provider || "";
-    const providerName = providerFull
-      ? providerFull.substring(0, 12) + "..."
-      : "-";
+    const providerNameFull = contract.provider_name || "-";
+    const providerNameShort =
+      providerNameFull.length > 18
+        ? providerNameFull.slice(0, 18) + "…"
+        : providerNameFull;
+
+    const providerId = contract.provider || "";
 
     const queries = contract.queries_per_minute
       ? contract.queries_per_minute
@@ -56,6 +77,7 @@ const ContractTable = ({ contracts, isp, location, columns }) => {
       id: contract.id,
       serviceNumber: serviceNumber,
       duration: contract.duration,
+      settlementHeight: settlementHeight,
       isp: isp,
       location: location,
       contractCost: `${rateObj.amount} ${rateObj.denom}`,
@@ -64,8 +86,9 @@ const ContractTable = ({ contracts, isp, location, columns }) => {
       queries: queries,
       type: type,
       status: status,
-      providerName: providerName,
-      providerFull: providerFull,
+      providerName: providerNameShort,
+      providerFull: providerNameFull,
+      providerId,
     };
   });
 

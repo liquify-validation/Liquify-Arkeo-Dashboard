@@ -22,6 +22,7 @@ import PieChart from "./PieChart";
 import ContractsFilterButtonGroup from "./ContractsFilterButtonGroup";
 import ScrollableStatsCardSection from "./ScrollableStatsCardSection";
 import ServiceTooltip from "./ServiceTooltip";
+import PillFilterButtonGroup from "./PillFilterButtonGroup";
 
 export {
   Pie,
@@ -48,4 +49,5 @@ export {
   ContractsFilterButtonGroup,
   ScrollableStatsCardSection,
   ServiceTooltip,
+  PillFilterButtonGroup,
 };

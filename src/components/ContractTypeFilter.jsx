@@ -1,6 +1,6 @@
 import { Button, ButtonGroup } from "@mui/material";
 
-const ContractsFilterButtonGroup = ({ filterType, setFilterType }) => {
+const ContractTypeFilter = ({ filterType, setFilterType }) => {
   const buttonStyles = (type) => ({
     backgroundColor: filterType === type ? " #1D8AED" : "#BABABA80",
     color: filterType === type ? "#FFFFFF" : "#000000",
@@ -15,19 +15,19 @@ const ContractsFilterButtonGroup = ({ filterType, setFilterType }) => {
         ALL
       </Button>
       <Button
-        onClick={() => setFilterType("ACTIVE")}
+        onClick={() => setFilterType("PAY_AS_YOU_GO")}
         sx={buttonStyles("ACTIVE")}
       >
-        ACTIVE
+        PAY AS YOU GO
       </Button>
       <Button
-        onClick={() => setFilterType("COMPLETED")}
+        onClick={() => setFilterType("SUBSCRIPTION")}
         sx={buttonStyles("COMPLETED")}
       >
-        COMPLETED
+        SUBSCRIPTION
       </Button>
     </ButtonGroup>
   );
 };
 
-export default ContractsFilterButtonGroup;
+export default ContractTypeFilter;

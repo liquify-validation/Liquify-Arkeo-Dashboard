@@ -35,6 +35,7 @@ const Provider = () => {
       <Box m="20px" pb={4}>
         <Box m="20px" display="flex" alignItems="center" gap="15px">
           <Header title={providerName || "Provider"} />
+
           {
             <img
               src={

@@ -15,11 +15,9 @@ import {
   Explore,
   Provider,
   Providers,
-  Settings,
   PieChart,
   Docs,
   Leaderboard,
-  ProvidersTable,
   Contract,
   AllContracts,
 } from "./pages/";
@@ -77,10 +75,7 @@ function App() {
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/explore" element={<Explore />} />
                     <Route path="/providers" element={<Providers />} />
-                    <Route
-                      path="/providers-statistics"
-                      element={<ProvidersTable />}
-                    />
+
                     <Route
                       path="/contracts/:providerId"
                       element={<Contract />}
@@ -88,7 +83,6 @@ function App() {
                     <Route path="/contracts" element={<AllContracts />} />
 
                     <Route path="/provider" element={<Provider />} />
-                    <Route path="/settings" element={<Settings />} />
                     <Route path="/piechart" element={<PieChart />} />
                     <Route path="/docs" element={<Docs />} />
                     <Route path="/leaderboard" element={<Leaderboard />} />

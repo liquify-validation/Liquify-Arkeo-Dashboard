@@ -16,8 +16,10 @@ const ServicesTooltip = ({ services, isDarkMode }) => {
           <Typography variant="subtitle1" fontWeight="bold" mb={1}>
             Services
           </Typography>
-          {servicesArray.map((service, idx) => {
-            const iconSrc = getServiceIconPath(service, isDarkMode);
+          {servicesArray.map((s, idx) => {
+            const id = typeof s === "object" ? s.id : s;
+            const name = typeof s === "object" ? s.name : s;
+            const iconSrc = getServiceIconPath(name || id, isDarkMode);
             return (
               <Box
                 key={idx}
@@ -29,13 +31,11 @@ const ServicesTooltip = ({ services, isDarkMode }) => {
                 <Box
                   component="img"
                   src={iconSrc}
-                  alt={service || "Default Service"}
+                  alt={name || "Service"}
                   width={25}
                   height={25}
                 />
-                <Typography variant="body2">
-                  {service || "Default Service"}
-                </Typography>
+                <Typography variant="body2">{name || id}</Typography>
               </Box>
             );
           })}

@@ -70,11 +70,15 @@ const Dashboard = () => {
     error: chainAnalyticsError,
   } = useChainAnalytics(offsetRequests, chainListData);
 
+  console.log("chainAnalyticsData", chainAnalyticsData);
+
   const {
     data: allContractsData,
     isLoading: allContractsLoading,
     error: allContractsError,
   } = useAllContracts();
+
+  console.log("all contracts data", allContractsData);
 
   const [filterType, setFilterType] = useState("ALL");
 
@@ -92,12 +96,9 @@ const Dashboard = () => {
 
   const contractDistributionData = useMemo(() => {
     const providerMap = {};
-    filteredContracts.forEach((contract) => {
-      const provider = contract.provider;
-      if (!providerMap[provider]) {
-        providerMap[provider] = 0;
-      }
-      providerMap[provider]++;
+    filteredContracts.forEach((c) => {
+      const name = c.provider_name || c.provider || "Unknown";
+      providerMap[name] = (providerMap[name] || 0) + 1;
     });
 
     const colorPalette = [
@@ -237,15 +238,13 @@ const Dashboard = () => {
           ></Box>
         </Box>
 
-        {/* Chart Sections */}
-        <Box
+        {/* <Box
           display="grid"
           gridTemplateColumns="repeat(12, 1fr)"
           gap="2rem"
           mt={5}
           alignItems="stretch"
         >
-          {/* Distribution of Network Providers */}
           <Box
             gridColumn="span 6"
             className="gradient-border-mask"
@@ -286,7 +285,6 @@ const Dashboard = () => {
             </Box>
           </Box>
 
-          {/* Request Distribution by Network */}
           <Box
             gridColumn="span 6"
             className="gradient-border-mask"
@@ -335,7 +333,7 @@ const Dashboard = () => {
               )}
             </Box>
           </Box>
-        </Box>
+        </Box> */}
 
         <Box
           display="grid"
