@@ -50,23 +50,45 @@ const ColumnVisibilityToggle = ({
     handleClose();
   };
 
+  const closePopover = (save = true) => {
+    if (save) onVisibilityChange(tempVisibility);
+    setAnchorEl(null);
+  };
+
   const half = Math.ceil(columns.length / 2);
   const leftColumns = columns.slice(0, half);
   const rightColumns = columns.slice(half);
+
+  const switchSx = {
+    "& .MuiSwitch-track": {
+      backgroundColor: "#254c90 !important",
+      opacity: 1,
+    },
+
+    "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+      backgroundColor: "#146bf4 !important",
+      opacity: 1,
+    },
+
+    "& .MuiSwitch-thumb, & .MuiSwitch-switchBase.Mui-checked .MuiSwitch-thumb":
+      {
+        boxShadow: "none",
+      },
+  };
 
   return (
     <Box mr={1}>
       <IconButton onClick={handleOpen}>
         <FilterListIcon />
         <Typography variant="body2" ml={1}>
-          Add Filter
+          Filter Columns
         </Typography>
       </IconButton>
 
       <Popover
         open={open}
         anchorEl={anchorEl}
-        onClose={handleClose}
+        onClose={() => closePopover(true)}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
         <Box
@@ -100,16 +122,7 @@ const ColumnVisibilityToggle = ({
                     <Switch
                       checked={tempVisibility[col.field] !== false}
                       onChange={() => handleToggle(col.field)}
-                      sx={{
-                        "& .MuiSwitch-track": {
-                          backgroundColor: "#166cf9 !important",
-                          opacity: 1,
-                        },
-                        "&.Mui-checked .MuiSwitch-track": {
-                          backgroundColor: "#166cf9 !important",
-                          opacity: 1,
-                        },
-                      }}
+                      sx={switchSx}
                     />
                   }
                 />
@@ -129,14 +142,7 @@ const ColumnVisibilityToggle = ({
                     <Switch
                       checked={tempVisibility[col.field] !== false}
                       onChange={() => handleToggle(col.field)}
-                      sx={{
-                        "& .MuiSwitch-track": {
-                          backgroundColor: "#166cf9 !important",
-                        },
-                        "&.Mui-checked .MuiSwitch-track": {
-                          backgroundColor: "#166cf9 !important",
-                        },
-                      }}
+                      sx={switchSx}
                     />
                   }
                 />
@@ -147,14 +153,14 @@ const ColumnVisibilityToggle = ({
           <Box display="flex" justifyContent="center" gap={4}>
             <Button
               variant="outlined"
-              onClick={handleCancel}
+              onClick={() => closePopover(false)}
               className="cancel-button"
             >
               Cancel
             </Button>
             <Button
               variant="contained"
-              onClick={handleSave}
+              onClick={() => closePopover(true)}
               className="save-button"
             >
               Save

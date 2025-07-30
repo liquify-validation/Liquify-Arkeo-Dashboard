@@ -35,10 +35,15 @@ const AllContractsTable = ({ contracts, getProviderNameFunction, columns }) => {
       ? JSON.parse(contract.rate.replace(/'/g, '"'))
       : { denom: "", amount: "" };
 
-    const status = contract.completed === null ? "In Progress" : "Completed";
+    const status = contract.completed ? "Completed" : "In Progress";
 
-    const providerFull = contract.provider;
-    const providerShort = providerFull.slice(-4);
+    const providerId = contract.provider || "";
+    const providerShort = providerId.slice(-4);
+    const providerName =
+      contract.provider_name ??
+      (getProviderNameFunction
+        ? getProviderNameFunction(providerId)
+        : `${providerId.slice(0, 12)}...`);
 
     let timeRemaining = "-";
     if (
@@ -59,26 +64,22 @@ const AllContractsTable = ({ contracts, getProviderNameFunction, columns }) => {
       }
     }
 
-    const queries = contract.queries_per_minute
-      ? contract.queries_per_minute
-      : "-";
-    const providerName = getProviderNameFunction
-      ? getProviderNameFunction(providerFull)
-      : providerFull.substring(0, 12) + "...";
+    const queries = contract.queries_per_minute ?? "-";
 
     return {
       id: contract.id,
       serviceNumber: contract.service,
-      providerFull: providerFull,
-      providerShort: providerShort,
-      providerName: providerName,
+      providerId,
+      providerShort,
+      providerName,
       duration: contract.duration,
+      settlementHeight: contract.settlement_height ?? "-",
       contractCost: `${rateObj.amount} ${rateObj.denom}`,
       callsSubmitted: contract.nonce,
-      timeRemaining: timeRemaining,
-      queries: queries,
+      timeRemaining,
+      queries,
       type: contract.type,
-      status: status,
+      status,
     };
   });
 
@@ -86,16 +87,15 @@ const AllContractsTable = ({ contracts, getProviderNameFunction, columns }) => {
     if (col.field === "serviceNumber") {
       return {
         ...col,
-        renderCell: (params) => {
-          const serviceNumber = params.value;
-          return <ServiceCell serviceNumber={serviceNumber} />;
-        },
+        renderCell: (params) => <ServiceCell serviceNumber={params.value} />,
       };
-    } else if (col.field === "providerShort") {
+    }
+
+    if (col.field === "providerShort") {
       return {
         ...col,
         renderCell: (params) => {
-          const fullProvider = params.row.providerFull;
+          const fullProvider = params.row.providerId;
           const shortProvider = params.value;
           return (
             <Box display="flex" alignItems="center" gap={1}>
@@ -117,13 +117,15 @@ const AllContractsTable = ({ contracts, getProviderNameFunction, columns }) => {
           );
         },
       };
-    } else if (col.field === "providerName") {
+    }
+
+    if (col.field === "providerName") {
       return {
         ...col,
         renderCell: (params) => {
-          const providerId = params.row.providerFull;
+          const providerId = params.row.providerId;
           const providerName = params.value;
-          const providerUrl = `http://localhost:5173/contracts/${providerId}?location=UNKNOWN&isp=RTCOMM&providerName=${encodeURIComponent(
+          const providerUrl = `/contracts/${providerId}?location=UNKNOWN&isp=RTCOMM&providerName=${encodeURIComponent(
             providerName
           )}`;
           return (
@@ -137,6 +139,7 @@ const AllContractsTable = ({ contracts, getProviderNameFunction, columns }) => {
         },
       };
     }
+
     return col;
   });
 

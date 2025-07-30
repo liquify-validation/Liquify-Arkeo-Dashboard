@@ -12,10 +12,13 @@ import {
 } from "../components";
 
 import { HexMap, HexMapLight } from "../assets";
+import ContractTypeFilter from "../components/ContractTypeFilter";
+import PillFilterButtonGroup from "../components/PillFilterButtonGroup";
 
 const AllContracts = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const [typeFilter, setTypeFilter] = useState("ALL");
 
   const {
     data: allData,
@@ -70,6 +73,29 @@ const AllContracts = () => {
     completedError,
   ]);
 
+  const contractsArray = useMemo(
+    () => (contractsData ? Object.values(contractsData) : []),
+    [contractsData]
+  );
+
+  const contractsByType = useMemo(() => {
+    if (typeFilter === "ALL") return contractsArray;
+    const canon = typeFilter.toUpperCase(); // "PAY AS YOU GO" | "SUBSCRIPTION"
+    return contractsArray.filter((c) => (c.type || "").toUpperCase() === canon);
+  }, [contractsArray, typeFilter]);
+
+  const statusOptions = [
+    { value: "ALL", label: "ALL" },
+    { value: "ACTIVE", label: "ACTIVE" },
+    { value: "COMPLETED", label: "COMPLETED" },
+  ];
+
+  const typeOptions = [
+    { value: "ALL", label: "ALL" },
+    { value: "PAY_AS_YOU_GO", label: "PAY AS YOU GO" },
+    { value: "SUBSCRIPTION", label: "SUBSCRIPTION" },
+  ];
+
   const initialColumns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "serviceNumber", headerName: "Service", flex: 1 },
@@ -80,6 +106,7 @@ const AllContracts = () => {
     { field: "callsSubmitted", headerName: "# of Calls Submitted", flex: 1 },
     { field: "timeRemaining", headerName: "Time Remaining", flex: 1 },
     { field: "queries", headerName: "Queries Per Minute", flex: 1 },
+    { field: "settlementHeight", headerName: "Settlement Height", flex: 1 },
     { field: "type", headerName: "Type", flex: 1 },
     { field: "status", headerName: "Status", flex: 1 },
   ];
@@ -97,8 +124,6 @@ const AllContracts = () => {
 
   if (isLoading) return <Typography>Loading contracts...</Typography>;
   if (error) return <Typography>Error loading contracts!</Typography>;
-
-  const contractsArray = contractsData ? Object.values(contractsData) : [];
 
   const hexmapClassName = `hexmap-bg ${
     theme.palette.mode === "dark" ? "hexmap-dark" : "hexmap-light"
@@ -128,10 +153,18 @@ const AllContracts = () => {
         <ScrollableStatsCardSection />
       </Box>
       <Box sx={{ mx: "auto", ml: 3 }}>
-        <ContractsFilterButtonGroup
-          filterType={filterType}
-          setFilterType={setFilterType}
+        <PillFilterButtonGroup
+          value={filterType}
+          options={statusOptions}
+          onChange={setFilterType}
         />
+        {/* <Box mt={3}>
+          <PillFilterButtonGroup
+            value={typeFilter}
+            options={typeOptions}
+            onChange={setTypeFilter}
+          />
+        </Box> */}
       </Box>
       <Box sx={{ mx: "auto", pb: 4 }}>
         <Box display="flex" justifyContent="flex-end" mb={2} mr={2}>
@@ -143,7 +176,8 @@ const AllContracts = () => {
         </Box>
 
         <AllContractsTable
-          contracts={contractsArray}
+          contracts={contractsByType}
+          filterType={filterType}
           columns={filteredColumns}
         />
       </Box>

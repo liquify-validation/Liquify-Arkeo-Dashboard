@@ -1,3 +1,4 @@
+import React, { useState, useMemo } from "react";
 import { useSearchParams, useParams, useNavigate } from "react-router-dom";
 import { Box, Typography, useTheme, Tooltip, IconButton } from "@mui/material";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
@@ -9,9 +10,9 @@ import { HexMap, HexMapLight } from "../assets";
 import {
   ScrollableStatsCardSection,
   ColumnVisibilityToggle,
-  ContractsFilterButtonGroup,
+  PillFilterButtonGroup,
 } from "../components";
-import React, { useState, useMemo } from "react";
+import { last4 } from "../utils/commonFunctions";
 
 const Contract = () => {
   const theme = useTheme();
@@ -22,6 +23,20 @@ const Contract = () => {
   const location = searchParams.get("location") || "N/A";
   const isp = searchParams.get("isp") || "N/A";
   const providerName = searchParams.get("providerName") || "Provider";
+  const [statusFilter, setStatusFilter] = useState("ALL"); // ALL / ACTIVE / COMPLETED
+  const [typeFilter, setTypeFilter] = useState("ALL"); // ALL / PAY_AS_YOU_GO / SUBSCRIPTION
+
+  const statusOptions = [
+    { value: "ALL", label: "ALL" },
+    { value: "ACTIVE", label: "ACTIVE" },
+    { value: "COMPLETED", label: "COMPLETED" },
+  ];
+
+  const typeOptions = [
+    { value: "ALL", label: "ALL" },
+    { value: "PAY_AS_YOU_GO", label: "PAY AS YOU GO" },
+    { value: "SUBSCRIPTION", label: "SUBSCRIPTION" },
+  ];
 
   const {
     data: contractsData,
@@ -41,6 +56,7 @@ const Contract = () => {
     { field: "callsSubmitted", headerName: "# of Calls Submitted", flex: 1 },
     { field: "timeRemaining", headerName: "Time Remaining", flex: 1 },
     { field: "queries", headerName: "Queries Per Minute", flex: 1 },
+    { field: "settlementHeight", headerName: "Settlement Height", flex: 1 },
     { field: "type", headerName: "Type", flex: 1 },
     { field: "status", headerName: "Status", flex: 1 },
   ];
@@ -56,18 +72,17 @@ const Contract = () => {
     return initialColumns.filter((col) => visibleColumns[col.field] !== false);
   }, [initialColumns, visibleColumns]);
 
-  const contractsArray = contractsData ? Object.values(contractsData) : [];
+  const contractsArray = useMemo(
+    () => (contractsData ? Object.values(contractsData) : []),
+    [contractsData]
+  );
 
-  const filteredContracts = useMemo(() => {
-    if (!contractsArray) return [];
-    if (filterType === "ALL") {
-      return contractsArray;
-    } else if (filterType === "ACTIVE") {
-      return contractsArray.filter((c) => c.completed === false);
-    } else {
-      return contractsArray.filter((c) => c.completed === true);
-    }
-  }, [contractsArray, filterType]);
+  const typeFilteredContracts = useMemo(() => {
+    if (typeFilter === "ALL") return contractsArray;
+    return contractsArray.filter(
+      (c) => (c.type || "").toUpperCase() === typeFilter
+    );
+  }, [contractsArray, typeFilter]);
 
   const hexmapClassName = `hexmap-bg ${
     theme.palette.mode === "dark" ? "hexmap-dark" : "hexmap-light"
@@ -132,7 +147,7 @@ const Contract = () => {
             variant="body2"
             sx={{ color: colors.text[200], mr: 1, cursor: "pointer" }}
           >
-            {providerId}
+            {last4(providerId)}
           </Typography>
           <Tooltip title="Copy ID">
             <IconButton
@@ -151,10 +166,18 @@ const Contract = () => {
       </Box>
 
       <Box sx={{ mx: "auto", ml: 3 }}>
-        <ContractsFilterButtonGroup
-          filterType={filterType}
-          setFilterType={setFilterType}
+        <PillFilterButtonGroup
+          value={statusFilter}
+          options={statusOptions}
+          onChange={setStatusFilter}
         />
+        {/* <Box mt={2}>
+          <PillFilterButtonGroup
+            value={typeFilter}
+            options={typeOptions}
+            onChange={setTypeFilter}
+          />
+        </Box> */}
       </Box>
 
       <Box display="flex" justifyContent="flex-end" mb={2} mr={2}>
@@ -166,7 +189,8 @@ const Contract = () => {
       </Box>
 
       <ContractTable
-        contracts={filteredContracts}
+        contracts={typeFilteredContracts}
+        filterType={statusFilter}
         isp={isp}
         location={location}
         columns={filteredColumns}

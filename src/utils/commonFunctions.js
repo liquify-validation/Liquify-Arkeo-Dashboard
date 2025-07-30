@@ -72,3 +72,6 @@ export const secondsToTimeObject = (totalSeconds) => {
   const seconds = Math.floor(totalSeconds % 60);
   return { hours, minutes, seconds };
 };
+
+export const last4 = (str) =>
+  str && str.length > 4 ? `…${str.slice(-4)}` : str || "";

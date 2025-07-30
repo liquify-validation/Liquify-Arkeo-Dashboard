@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Typography,
@@ -17,6 +17,8 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import { useProviderPerformance } from "../hooks/useProviderPerformance";
 import ProviderPerformanceChart from "./ProviderPerformanceChart";
+import { useProviderContracts } from "../hooks/useProviderContracts";
+import { useServiceNames } from "../hooks/useServiceNames";
 
 import { useNavigate } from "react-router-dom";
 import { useServiceName } from "../hooks/useServiceName";
@@ -24,6 +26,7 @@ import ServicesTooltip from "./ServiceTooltip";
 
 // TO DO - Swap out any mock data and logic for open and online
 // TO DO - Look at OFFLINE/Online logic
+//TODO - Swap in uptime stats
 
 const isValidHttpUrl = (string) => {
   let url;
@@ -120,14 +123,30 @@ const ProviderCard = ({
     );
   };
 
-  const serviceNumber = providerData?.services;
+  const rawServices = providerData?.services;
+  const serviceIds = React.useMemo(() => {
+    if (!rawServices) return [];
+    if (Array.isArray(rawServices)) return rawServices;
+    if (typeof rawServices === "string") {
+      try {
+        const parsed = JSON.parse(rawServices);
+        if (Array.isArray(parsed)) return parsed;
+      } catch (e) {
+        /* ignore */
+      }
+      return rawServices
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
+    }
+    return [];
+  }, [rawServices]);
+
   const {
-    data: serviceName,
+    data: serviceList,
     isLoading: serviceLoading,
     error: serviceError,
-  } = useServiceName(serviceNumber);
-
-  console.log("service name", serviceName);
+  } = useServiceNames(serviceIds);
 
   const {
     data: performanceData,
@@ -146,6 +165,15 @@ const ProviderCard = ({
       </Box>
     );
   };
+
+  const { data: contractsData, isLoading: contractsLoading } =
+    useProviderContracts(providerId);
+
+  const closedContracts = (() => {
+    if (!contractsData) return 0;
+    const list = Object.values(contractsData);
+    return list.filter((c) => c.completed === true).length;
+  })();
 
   return (
     <Box
@@ -193,7 +221,9 @@ const ProviderCard = ({
         justifyContent="space-between"
       >
         <Typography variant="p">Completed Contracts:</Typography>
-        <Typography variant="p">{completedContracts}</Typography>
+        <Typography variant="p">
+          {contractsLoading ? "…" : closedContracts}
+        </Typography>
       </Box>
       <Box
         mt={1.5}
@@ -207,7 +237,10 @@ const ProviderCard = ({
         <Box display="flex" alignItems="center">
           <Typography variant="p">{numberOfServices}</Typography>
           {numberOfServices > 0 && (
-            <ServicesTooltip services={serviceName} isDarkMode={isDarkMode} />
+            <ServicesTooltip
+              services={serviceList || []}
+              isDarkMode={isDarkMode}
+            />
           )}
         </Box>
       </Box>
@@ -358,7 +391,7 @@ const ProviderCard = ({
         justifyContent="space-between"
       >
         <Typography variant="p">Uptime:</Typography>
-        <Typography variant="p">{uptime}%</Typography>
+        <Typography variant="p">100%</Typography>
       </Box>
       <Box
         mt={1.5}
@@ -483,6 +516,7 @@ const ProviderCard = ({
               textTransform: "uppercase",
               fontWeight: "semibold",
               color: "white",
+              ml: 1,
             }}
           >
             Contracts
