@@ -1,6 +1,5 @@
-import React from "react";
 import { ResponsivePie } from "@nivo/pie";
-import { useTheme, Tooltip } from "@mui/material";
+import { useTheme } from "@mui/material";
 import { tokens } from "../theme";
 
 const PieChart = ({ data, title }) => {

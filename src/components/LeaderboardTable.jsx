@@ -3,8 +3,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../theme";
 import { leaderboardData } from "../data/mockData";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
-import { use24hrCalls } from "../hooks/use24hrCalls";
-import { useProviders } from "../hooks/useProviders";
+// import { use24hrCalls } from "../hooks/use24hrCalls";
+// import { useProviders } from "../hooks/useProviders";
 
 const LeaderboardTable = () => {
   const theme = useTheme();

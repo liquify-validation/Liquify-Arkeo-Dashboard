@@ -8,12 +8,11 @@ import {
   AllContractsTable,
   ScrollableStatsCardSection,
   ColumnVisibilityToggle,
-  ContractsFilterButtonGroup,
 } from "../components";
 
 import { HexMap, HexMapLight } from "../assets";
-import ContractTypeFilter from "../components/ContractTypeFilter";
 import PillFilterButtonGroup from "../components/PillFilterButtonGroup";
+import { autoHideCallsColumn } from "../utils/commonFunctions";
 
 const AllContracts = () => {
   const theme = useTheme();
@@ -119,8 +118,11 @@ const AllContracts = () => {
   );
 
   const filteredColumns = useMemo(() => {
-    return initialColumns.filter((col) => visibleColumns[col.field] !== false);
-  }, [initialColumns, visibleColumns]);
+    const userVisible = initialColumns.filter(
+      (col) => visibleColumns[col.field] !== false
+    );
+    return autoHideCallsColumn(userVisible, typeFilter);
+  }, [initialColumns, visibleColumns, typeFilter]);
 
   if (isLoading) return <Typography>Loading contracts...</Typography>;
   if (error) return <Typography>Error loading contracts!</Typography>;
@@ -158,18 +160,18 @@ const AllContracts = () => {
           options={statusOptions}
           onChange={setFilterType}
         />
-        {/* <Box mt={3}>
+        <Box mt={3}>
           <PillFilterButtonGroup
             value={typeFilter}
             options={typeOptions}
             onChange={setTypeFilter}
           />
-        </Box> */}
+        </Box>
       </Box>
       <Box sx={{ mx: "auto", pb: 4 }}>
         <Box display="flex" justifyContent="flex-end" mb={2} mr={2}>
           <ColumnVisibilityToggle
-            columns={initialColumns}
+            columns={autoHideCallsColumn(initialColumns, typeFilter)}
             visibleColumns={visibleColumns}
             onVisibilityChange={setVisibleColumns}
           />

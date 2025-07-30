@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   IconButton,
@@ -27,10 +27,6 @@ const ColumnVisibilityToggle = ({
     setTempVisibility(visibleColumns);
   };
 
-  const handleClose = () => {
-    setAnchorEl(null);
-  };
-
   const open = Boolean(anchorEl);
 
   const handleToggle = (field) => {
@@ -39,15 +35,6 @@ const ColumnVisibilityToggle = ({
       [field]: !tempVisibility[field],
     };
     setTempVisibility(newVisibility);
-  };
-
-  const handleSave = () => {
-    onVisibilityChange(tempVisibility);
-    handleClose();
-  };
-
-  const handleCancel = () => {
-    handleClose();
   };
 
   const closePopover = (save = true) => {

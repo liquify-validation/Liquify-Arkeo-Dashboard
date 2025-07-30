@@ -239,7 +239,7 @@ const Providers = () => {
             const contracts = JSON.parse(provider.contracts || "{}");
             const openContracts = Object.keys(contracts).length;
             const age = provider.last_update ? provider.last_update : "N/A";
-            const uptime = provider.uptime ? provider.uptime : "N/A";
+            const displayUptime = status === "OFFLINE" ? "0 %" : "100 %";
 
             return (
               <Box
@@ -272,7 +272,7 @@ const Providers = () => {
                   age={age}
                   numberOfServices={provider.number_of_services}
                   completedContracts={provider.completed_contracts || "0"}
-                  uptime={uptime}
+                  uptime={displayUptime}
                   amountTaxed={provider.amountTaxed || "N/A"}
                   location={provider.location || "N/A"}
                   renewedContracts={"0"}

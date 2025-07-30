@@ -5,9 +5,6 @@ import { getServiceIconPath } from "../utils/commonFunctions";
 
 const ServicesTooltip = ({ services, isDarkMode }) => {
   const servicesArray = Array.isArray(services) ? services : [services];
-
-  console.log(services);
-
   return (
     <Tooltip
       arrow

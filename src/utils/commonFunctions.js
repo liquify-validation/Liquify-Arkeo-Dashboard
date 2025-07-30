@@ -75,3 +75,8 @@ export const secondsToTimeObject = (totalSeconds) => {
 
 export const last4 = (str) =>
   str && str.length > 4 ? `…${str.slice(-4)}` : str || "";
+
+export const autoHideCallsColumn = (cols, typeFilter) =>
+  typeFilter === "SUBSCRIPTION"
+    ? cols.filter((c) => c.field !== "callsSubmitted")
+    : cols;
