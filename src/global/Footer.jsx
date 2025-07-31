@@ -4,6 +4,10 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import XIcon from "@mui/icons-material/X";
 import EmailIcon from "@mui/icons-material/Email";
 
+const EmailUrl = import.meta.env.VITE_CONTACT_EMAIL;
+const GithubUrl = import.meta.env.VITE_GITHUB_URL;
+const XUrl = import.meta.env.VITE_TWITTER_URL;
+
 const Footer = () => {
   return (
     <Box
@@ -47,26 +51,18 @@ const Footer = () => {
         </Grid>
 
         <Grid item style={{ textAlign: "right", marginRight: "10px" }}>
-          <Link
-            href="https://github.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link href={GithubUrl} target="_blank" rel="noopener noreferrer">
             <IconButton aria-label="GitHub" size="large">
               <GitHubIcon fontSize="large" style={{ color: "white" }} />
             </IconButton>
           </Link>
-          <Link
-            href="https://example.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link href={XUrl} target="_blank" rel="noopener noreferrer">
             {" "}
             <IconButton aria-label="X" size="large">
               <XIcon fontSize="large" style={{ color: "white" }} />
             </IconButton>
           </Link>
-          <Link href="mailto:email@example.com">
+          <Link href={`mailto:${EmailUrl}`}>
             {" "}
             <IconButton aria-label="Email" size="large">
               <EmailIcon fontSize="large" style={{ color: "white" }} />
