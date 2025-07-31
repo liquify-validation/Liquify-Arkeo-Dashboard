@@ -6,7 +6,9 @@ export const useProviderContracts = (providerId) => {
     queryKey: ["providerContracts", providerId],
     queryFn: () => fetchProviderContracts(providerId),
     enabled: !!providerId,
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0,
+    refetchInterval: 2000,
+    refetchIntervalInBackground: true,
     cacheTime: 1000 * 60 * 5,
   });
 };

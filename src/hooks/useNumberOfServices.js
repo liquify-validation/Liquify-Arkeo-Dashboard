@@ -5,8 +5,8 @@ export const useNumberOfServices = () => {
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ["numberOfServices"],
     queryFn: fetchNumberOfServices,
-    staleTime: 1000 * 60 * 5,
-    cacheTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 1,
+    cacheTime: 1000 * 60 * 1,
   });
 
   return { data, error, isLoading, isError };

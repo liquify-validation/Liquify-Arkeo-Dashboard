@@ -89,6 +89,10 @@ const Providers = () => {
     }
   }
 
+  function computeProviderStatus(provider) {
+    return (provider.status || "UNKNOWN").toUpperCase();
+  }
+
   const handleCardsPerPageChange = (event) => {
     const value = event.target.value;
     if (value === "All") {
@@ -226,15 +230,8 @@ const Providers = () => {
         >
           {currentProviders.map((p, index) => {
             const provider = providerData[p.key];
-            const endpoints = JSON.parse(provider.endpoints || "{}");
-            const endpointKeys = Object.keys(endpoints);
 
-            let status = "OFFLINE";
-            if (endpointKeys.length > 0) {
-              const singleEndpoint = endpoints[endpointKeys[0]];
-              status =
-                singleEndpoint.status === "ONLINE" ? "ONLINE" : "OFFLINE";
-            }
+            const status = computeProviderStatus(provider);
 
             const contracts = JSON.parse(provider.contracts || "{}");
             const openContracts = Object.keys(contracts).length;

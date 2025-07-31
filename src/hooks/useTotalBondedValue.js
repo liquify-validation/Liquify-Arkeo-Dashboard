@@ -2,14 +2,12 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchTotalBondedValue } from "../services/api";
 import { useMemo } from "react";
 
-// TO DO - look at stale and cache times
-
 export const useTotalBondedValue = () => {
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ["totalBondedValue"],
     queryFn: fetchTotalBondedValue,
-    staleTime: 1000 * 60 * 5,
-    cacheTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 1,
+    cacheTime: 1000 * 60 * 1,
   });
 
   const formattedValue = useMemo(() => {
