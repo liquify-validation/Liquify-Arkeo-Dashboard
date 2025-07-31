@@ -5,8 +5,8 @@ export const use24hrCalls = () => {
   const { data, error, isLoading, isError } = useQuery({
     queryKey: ["24hrCalls"],
     queryFn: fetch24hrCalls,
-    staleTime: 1000 * 60 * 5,
-    cacheTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 1,
+    cacheTime: 1000 * 60 * 1,
   });
 
   const calls = data ? data.total_nonce : 0;
