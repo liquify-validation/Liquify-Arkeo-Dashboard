@@ -1,8 +1,14 @@
-import { Box, TextField, InputAdornment } from "@mui/material";
+import {
+  Box,
+  TextField,
+  InputAdornment,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import CustomButton from "../components/CustomButton";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 
 const ProvidersBar = ({ onSearchChange }) => {
   const handleInputChange = (e) => {
@@ -19,8 +25,32 @@ const ProvidersBar = ({ onSearchChange }) => {
       alignItems="center"
       width="94%"
     >
-      <Link to="/leaderboard" style={{ textDecoration: "none" }}>
-        <CustomButton
+      <Tooltip
+        title={
+          <Typography sx={{ fontSize: "1rem", fontWeight: 500 }}>
+            Coming&nbsp;Soon
+          </Typography>
+        }
+      >
+        <span>
+          <CustomButton
+            text="Leaderboards"
+            icon={LeaderboardIcon}
+            size="medium"
+            radius="25px"
+            fontSize="16px"
+            fontWeight="600"
+            font="Poppins"
+            horizontalPadding="25px"
+            verticalPadding="15px"
+            className="gradient-button-border-mask"
+            disabled
+            sx={{ pointerEvents: "none" }}
+          />
+        </span>
+      </Tooltip>
+      {/* <Link to="/leaderboard" style={{ textDecoration: "none" }}> */}
+      {/* <CustomButton
           text="Leaderboards"
           icon={LeaderboardIcon}
           size="medium"
@@ -32,7 +62,7 @@ const ProvidersBar = ({ onSearchChange }) => {
           verticalPadding="8px"
           className="gradient-button-border-mask"
         />
-      </Link>
+      </Link> */}
       <TextField
         variant="outlined"
         className="gradient-border-mask"

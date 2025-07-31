@@ -171,3 +171,15 @@ export const fetchProviderPerformance = async (providerId) => {
   const data = await response.json();
   return data;
 };
+
+export const fetchNumberOfServicesPerChain = async () => {
+  const res = await fetch(`${ApiUrl}/network/number-of-services-per-chain`);
+  if (!res.ok) throw new Error("Failed to fetch number-of-services-per-chain");
+  const data = await res.json();
+
+  return Object.entries(data).map(([chainId, { name, count }]) => ({
+    chainId: Number(chainId),
+    name,
+    count,
+  }));
+};

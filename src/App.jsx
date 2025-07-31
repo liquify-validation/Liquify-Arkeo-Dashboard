@@ -85,7 +85,7 @@ function App() {
                     <Route path="/provider" element={<Provider />} />
                     <Route path="/piechart" element={<PieChart />} />
                     <Route path="/docs" element={<Docs />} />
-                    <Route path="/leaderboard" element={<Leaderboard />} />
+                    {/* <Route path="/leaderboard" element={<Leaderboard />} /> */}
                   </Routes>
                 </Box>
                 <Footer />

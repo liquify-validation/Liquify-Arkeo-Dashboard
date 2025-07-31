@@ -12,7 +12,7 @@ import {
   ColumnVisibilityToggle,
   PillFilterButtonGroup,
 } from "../components";
-import { last4 } from "../utils/commonFunctions";
+import { autoHideCallsColumn, last4 } from "../utils/commonFunctions";
 
 const Contract = () => {
   const theme = useTheme();
@@ -69,9 +69,11 @@ const Contract = () => {
   );
 
   const filteredColumns = useMemo(() => {
-    return initialColumns.filter((col) => visibleColumns[col.field] !== false);
-  }, [initialColumns, visibleColumns]);
-
+    const userVisible = initialColumns.filter(
+      (col) => visibleColumns[col.field] !== false
+    );
+    return autoHideCallsColumn(userVisible, typeFilter);
+  }, [initialColumns, visibleColumns, typeFilter]);
   const contractsArray = useMemo(
     () => (contractsData ? Object.values(contractsData) : []),
     [contractsData]
@@ -171,18 +173,18 @@ const Contract = () => {
           options={statusOptions}
           onChange={setStatusFilter}
         />
-        {/* <Box mt={2}>
+        <Box mt={2}>
           <PillFilterButtonGroup
             value={typeFilter}
             options={typeOptions}
             onChange={setTypeFilter}
           />
-        </Box> */}
+        </Box>
       </Box>
 
       <Box display="flex" justifyContent="flex-end" mb={2} mr={2}>
         <ColumnVisibilityToggle
-          columns={initialColumns}
+          columns={autoHideCallsColumn(initialColumns, typeFilter)}
           visibleColumns={visibleColumns}
           onVisibilityChange={setVisibleColumns}
         />

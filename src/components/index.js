@@ -23,6 +23,8 @@ import ContractsFilterButtonGroup from "./ContractsFilterButtonGroup";
 import ScrollableStatsCardSection from "./ScrollableStatsCardSection";
 import ServiceTooltip from "./ServiceTooltip";
 import PillFilterButtonGroup from "./PillFilterButtonGroup";
+import GenericProgressBars from "./GenericProgressBars";
+import ProgressBarsServices from "./ProgressBarsService";
 
 export {
   Pie,
@@ -50,4 +52,6 @@ export {
   ScrollableStatsCardSection,
   ServiceTooltip,
   PillFilterButtonGroup,
+  GenericProgressBars,
+  ProgressBarsServices,
 };

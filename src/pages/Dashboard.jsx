@@ -25,7 +25,9 @@ import {
   ContractsFilterButtonGroup,
   OffsetButtonGroup,
   PieChart,
+  ProgressBarsServices,
 } from "../components";
+import { useNumberOfServicesPerChain } from "../hooks/useNumberOfServicesPerChain";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -59,6 +61,12 @@ const Dashboard = () => {
   } = useProviderLocations();
 
   const {
+    data: servicesPerChain,
+    isLoading: servicesPerChainLoading,
+    error: servicesPerChainError,
+  } = useNumberOfServicesPerChain();
+
+  const {
     data: chainListData,
     isLoading: chainListLoading,
     error: chainListError,
@@ -70,15 +78,11 @@ const Dashboard = () => {
     error: chainAnalyticsError,
   } = useChainAnalytics(offsetRequests, chainListData);
 
-  console.log("chainAnalyticsData", chainAnalyticsData);
-
   const {
     data: allContractsData,
     isLoading: allContractsLoading,
     error: allContractsError,
   } = useAllContracts();
-
-  console.log("all contracts data", allContractsData);
 
   const [filterType, setFilterType] = useState("ALL");
 
@@ -127,6 +131,11 @@ const Dashboard = () => {
 
   const backgroundImageUrl =
     theme.palette.mode === "dark" ? HexMap : HexMapLight;
+
+  const totalServicesAcrossChains = useMemo(() => {
+    if (!servicesPerChain) return 0;
+    return servicesPerChain.reduce((sum, c) => sum + c.count, 0);
+  }, [servicesPerChain]);
 
   return (
     <Box
@@ -238,6 +247,153 @@ const Dashboard = () => {
           ></Box>
         </Box>
 
+        <Box
+          display="grid"
+          gridTemplateColumns="repeat(12, 1fr)"
+          gap="2rem"
+          mt={5}
+          alignItems="stretch"
+        >
+          <Box
+            gridColumn="span 6"
+            className="gradient-border-mask"
+            sx={{ display: "flex", flexDirection: "column", p: 2 }}
+          >
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ mb: 2 }}
+            >
+              <Typography
+                fontSize="26px"
+                fontWeight="700"
+                color={colors.text[100]}
+              >
+                Number of Services per Chain
+              </Typography>
+            </Box>
+
+            <Box sx={{ flexGrow: 1, p: 1, mt: 2, overflow: "auto" }}>
+              <ProgressBarsServices />
+            </Box>
+          </Box>
+
+          <Box
+            gridColumn="span 6"
+            className="gradient-border-mask"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              p: 2,
+            }}
+          >
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ flexShrink: 0, mb: 2 }}
+            >
+              <Typography
+                fontSize="26px"
+                fontWeight="700"
+                color={colors.text[100]}
+              >
+                Contract Distribution by Providers
+              </Typography>
+              <ContractsFilterButtonGroup
+                filterType={filterType}
+                setFilterType={setFilterType}
+              />
+            </Box>
+            <Box
+              sx={{
+                flexGrow: 1,
+                p: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "auto",
+              }}
+            >
+              {allContractsLoading ? (
+                <Typography color={colors.text[100]}>Loading...</Typography>
+              ) : allContractsError ? (
+                <Typography color="red">Error loading contracts</Typography>
+              ) : filteredContracts.length === 0 ? (
+                <Typography color={colors.text[100]}>
+                  {filterType === "ALL"
+                    ? "No contracts to show"
+                    : filterType === "ACTIVE"
+                    ? "No active contracts to show"
+                    : "No completed contracts to show"}
+                </Typography>
+              ) : (
+                <Box sx={{ width: "100%", height: "300px" }}>
+                  <PieChart data={contractDistributionData} />
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Box>
+
+        <Box
+          display="grid"
+          gridTemplateColumns="repeat(12, 1fr)"
+          gap="2rem"
+          mt={4}
+          pb={4}
+          alignItems="stretch"
+        >
+          <Box
+            gridColumn="span 12"
+            className="gradient-border-mask"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              p: 2,
+            }}
+          >
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ flexShrink: 0, mb: 2 }}
+            >
+              <Typography
+                fontSize="26px"
+                fontWeight="700"
+                color={colors.text[100]}
+              >
+                Location of Providers
+              </Typography>
+            </Box>
+            <Box
+              sx={{
+                flexGrow: 1,
+                p: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                overflow: "auto",
+              }}
+            >
+              {locationsLoading ? (
+                <Typography color={colors.text[100]}>Loading...</Typography>
+              ) : locationsError ? (
+                <Typography color="red">Error loading locations</Typography>
+              ) : (
+                <Box sx={{ width: "100%", height: "300px" }}>
+                  <PieChart data={providerLocationsData || []} />
+                </Box>
+              )}
+            </Box>
+          </Box>
+        </Box>
+
+        {/* ────────────────────────────────
+            COMMENTED‑OUT PANELS (to be reintroduced later)
+           ─────────────────────────────── */}
         {/* <Box
           display="grid"
           gridTemplateColumns="repeat(12, 1fr)"
@@ -248,11 +404,7 @@ const Dashboard = () => {
           <Box
             gridColumn="span 6"
             className="gradient-border-mask"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              p: 2,
-            }}
+            sx={{ display: "flex", flexDirection: "column", p: 2 }}
           >
             <Box
               display="flex"
@@ -334,111 +486,6 @@ const Dashboard = () => {
             </Box>
           </Box>
         </Box> */}
-
-        <Box
-          display="grid"
-          gridTemplateColumns="repeat(12, 1fr)"
-          gap="2rem"
-          mt={4}
-          pb={4}
-          alignItems="stretch"
-        >
-          {/* Contract Distribution by Providers */}
-          <Box
-            gridColumn="span 6"
-            className="gradient-border-mask"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              p: 2,
-            }}
-          >
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{ flexShrink: 0, mb: 2 }}
-            >
-              <Typography
-                fontSize="26px"
-                fontWeight="700"
-                color={colors.text[100]}
-              >
-                Contract Distribution by Providers
-              </Typography>
-              <ContractsFilterButtonGroup
-                filterType={filterType}
-                setFilterType={setFilterType}
-              />
-            </Box>
-            <Box
-              sx={{
-                flexGrow: 1,
-                p: 1,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                overflow: "auto",
-              }}
-            >
-              {allContractsLoading ? (
-                <Typography color={colors.text[100]}>Loading...</Typography>
-              ) : allContractsError ? (
-                <Typography color="red">Error loading contracts</Typography>
-              ) : (
-                <Box sx={{ width: "100%", height: "300px" }}>
-                  <PieChart data={contractDistributionData || []} />
-                </Box>
-              )}
-            </Box>
-          </Box>
-
-          {/* Location of Providers */}
-          <Box
-            gridColumn="span 6"
-            className="gradient-border-mask"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              p: 2,
-            }}
-          >
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              sx={{ flexShrink: 0, mb: 2 }}
-            >
-              <Typography
-                fontSize="26px"
-                fontWeight="700"
-                color={colors.text[100]}
-              >
-                Location of Providers
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                flexGrow: 1,
-                p: 1,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                overflow: "auto",
-              }}
-            >
-              {locationsLoading ? (
-                <Typography color={colors.text[100]}>Loading...</Typography>
-              ) : locationsError ? (
-                <Typography color="red">Error loading locations</Typography>
-              ) : (
-                <Box sx={{ width: "100%", height: "300px" }}>
-                  <PieChart data={providerLocationsData || []} />
-                </Box>
-              )}
-            </Box>
-          </Box>
-        </Box>
       </Box>
     </Box>
   );

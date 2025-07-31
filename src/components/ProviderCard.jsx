@@ -154,18 +154,6 @@ const ProviderCard = ({
     error: performanceError,
   } = useProviderPerformance(performanceDialogOpen ? providerId : null);
 
-  const servicesTooltipContent = () => {
-    if (serviceLoading) return "Loading...";
-    if (serviceError) return "Error loading service name";
-    if (!serviceName) return "No service name found";
-
-    return (
-      <Box display="flex" alignItems="center" gap={1}>
-        <Typography variant="body2">{serviceName}</Typography>
-      </Box>
-    );
-  };
-
   const { data: contractsData, isLoading: contractsLoading } =
     useProviderContracts(providerId);
 
@@ -391,7 +379,7 @@ const ProviderCard = ({
         justifyContent="space-between"
       >
         <Typography variant="p">Uptime:</Typography>
-        <Typography variant="p">100%</Typography>
+        <Typography variant="p">{uptime}</Typography>
       </Box>
       <Box
         mt={1.5}
