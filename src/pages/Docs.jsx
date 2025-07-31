@@ -159,11 +159,21 @@ const Docs = () => {
 
       <Typography variant="body2" paragraph>
         For more information:{" "}
-        <Link href="https://arkeo.network/" target="_blank" rel="noopener">
+        <Link
+          sx={{ color: "aqua" }}
+          href="https://arkeo.network/"
+          target="_blank"
+          rel="noopener"
+        >
           Arkeo Official Site
         </Link>{" "}
         |{" "}
-        <Link href="https://liquify.com/" target="_blank" rel="noopener">
+        <Link
+          sx={{ color: "aqua" }}
+          href="https://liquify.com/"
+          target="_blank"
+          rel="noopener"
+        >
           Liquify Official Site
         </Link>
       </Typography>

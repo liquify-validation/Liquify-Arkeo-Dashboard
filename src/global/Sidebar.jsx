@@ -1,21 +1,34 @@
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import "react-pro-sidebar/dist/css/styles.css";
 import { Box, Typography } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import WorkspacesOutlinedIcon from "@mui/icons-material/WorkspacesOutlined";
 import ArticleIcon from "@mui/icons-material/Article";
 import { ArkeoLogo, ArkeoIcon, AllProvidersIcon } from "../assets";
+import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 
-const Item = ({ title, to, icon, currentPath }) => {
+const Item = ({ title, to, icon, currentPath, external = false }) => {
+  const navigate = useNavigate();
+
+  if (external) {
+    return (
+      <MenuItem icon={icon} style={{ color: "white" }}>
+        <a href={to} target="_blank" rel="noopener noreferrer">
+          <Typography>{title}</Typography>
+        </a>
+      </MenuItem>
+    );
+  }
+
   return (
     <MenuItem
-      active={currentPath === to}
-      style={{ color: "white" }}
       icon={icon}
+      active={currentPath === to}
+      onClick={() => navigate(to)}
+      style={{ color: "white" }}
     >
       <Typography>{title}</Typography>
-      <Link to={to} />
     </MenuItem>
   );
 };
@@ -147,6 +160,14 @@ const Sidebar = ({ isSidebar }) => {
               to="/docs"
               icon={<ArticleIcon style={{ width: "30px", height: "30px" }} />}
               currentPath={currentPath}
+            />
+
+            <Item
+              title="Onboarding"
+              to="https://docs.arkeo.network/arkeo-for-data-providers/provider"
+              external
+              icon={<RocketLaunchIcon />}
+              currentPath={location}
             />
           </Box>
         </Menu>
