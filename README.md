@@ -23,7 +23,7 @@ A React-based dashboard providing real-time insights into **Arkeo Network data p
 ## Tech Stack
 
 - **Frontend**: React + Vite  
-- **Styling**: TailwindCSS  
+- **Styling**: MUI + CSS  
 - **Data Fetching**: Liquify Arkeo API 
 
 ---
