@@ -168,7 +168,7 @@ const ProviderCard = ({
       width="100%"
       padding="25px"
       height="auto"
-      minHeight="600px"
+      minHeight="650px"
       className="gradient-border-mask"
       sx={{ userSelect: "text" }}
     >
